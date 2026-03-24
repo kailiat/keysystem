@@ -3,15 +3,16 @@ const app = express();
 
 app.use(express.json());
 
+// ✅ QUAN TRỌNG: phải có 2 dòng này
 let keys = {};
-let passedUsers = {}; // ✅ FIX LỖI (thêm dòng này)
+let passedUsers = {};
 
 // HOME
 app.get("/", (req, res) => {
     res.send("Key system is running!");
 });
 
-// FUNCTION UI
+// UI HIỂN THỊ KEY
 function sendKeyPage(res, key) {
     res.send(`<!DOCTYPE html>
 <html>
@@ -70,35 +71,41 @@ function copyKey() {
 </html>`);
 }
 
-// GET KEY (GIỮ KEY 24H)
+// GET KEY
 app.get("/getkey", (req, res) => {
-    const token = req.query.token;
-    const ip = req.headers["x-forwarded-for"] || req.socket.remoteAddress;
+    try {
+        const token = req.query.token;
+        const ip = req.headers["x-forwarded-for"] || req.socket.remoteAddress;
 
-    if (!token || token !== "abc123") {
-        return res.send("❌ Access Denied");
-    }
-
-    // đánh dấu user (không gây lỗi nữa)
-    if (!passedUsers[ip]) {
-        passedUsers[ip] = true;
-    }
-
-    // giữ key 24h
-    for (let k in keys) {
-        if (keys[k].ip === ip && Date.now() < keys[k].expire) {
-            return sendKeyPage(res, k);
+        if (!token || token !== "abc123") {
+            return res.send("❌ Access Denied");
         }
+
+        // đánh dấu user
+        if (!passedUsers[ip]) {
+            passedUsers[ip] = true;
+        }
+
+        // giữ key 24h
+        for (let k in keys) {
+            if (keys[k].ip === ip && Date.now() < keys[k].expire) {
+                return sendKeyPage(res, k);
+            }
+        }
+
+        const key = Math.random().toString(36).substring(2, 10).toUpperCase();
+
+        keys[key] = {
+            ip: ip,
+            expire: Date.now() + 24 * 60 * 60 * 1000
+        };
+
+        return sendKeyPage(res, key);
+
+    } catch (err) {
+        console.log(err);
+        res.send("❌ Server Error");
     }
-
-    const key = Math.random().toString(36).substring(2, 10).toUpperCase();
-
-    keys[key] = {
-        ip: ip,
-        expire: Date.now() + 24 * 60 * 60 * 1000
-    };
-
-    return sendKeyPage(res, key);
 });
 
 // VERIFY
