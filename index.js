@@ -71,8 +71,16 @@ function copyKey() {
 
 // GET KEY (GIỮ KEY 24H)
 app.get("/getkey", (req, res) => {
+    const token = req.query.token;
+
+    // ❌ chặn truy cập trực tiếp
+    if (!token || token !== "abc123") {
+        return res.send("❌ Access Denied (Go through LootLabs)");
+    }
+
     const ip = req.headers["x-forwarded-for"] || req.socket.remoteAddress;
 
+    // giữ key 24h
     for (let k in keys) {
         if (keys[k].ip === ip && Date.now() < keys[k].expire) {
             return sendKeyPage(res, k);
