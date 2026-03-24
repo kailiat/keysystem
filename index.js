@@ -4,6 +4,7 @@ const app = express();
 app.use(express.json());
 
 let keys = {};
+let passedUsers = {}; // ✅ FIX LỖI (thêm dòng này)
 
 // HOME
 app.get("/", (req, res) => {
@@ -78,9 +79,8 @@ app.get("/getkey", (req, res) => {
         return res.send("❌ Access Denied");
     }
 
-    // ❌ nếu chưa từng qua lootlabs (chưa unlock)
+    // đánh dấu user (không gây lỗi nữa)
     if (!passedUsers[ip]) {
-        // lần đầu → đánh dấu đã qua
         passedUsers[ip] = true;
     }
 
