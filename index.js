@@ -78,16 +78,7 @@ app.get("/getkey", (req, res) => {
         return res.send("❌ Access Denied");
     }
 
-    // ❗ nếu IP khác → chặn
-    if (keys["LOCK"] && keys["LOCK"] !== ip) {
-        return res.send("❌ Link already used");
-    }
-
-    // lưu IP đầu tiên
-    if (!keys["LOCK"]) {
-        keys["LOCK"] = ip;
-    }
-
+    // giữ key 24h cho từng IP
     for (let k in keys) {
         if (keys[k].ip === ip && Date.now() < keys[k].expire) {
             return sendKeyPage(res, k);
