@@ -78,7 +78,13 @@ app.get("/getkey", (req, res) => {
         return res.send("❌ Access Denied");
     }
 
-    // giữ key 24h cho từng IP
+    // ❌ nếu chưa từng qua lootlabs (chưa unlock)
+    if (!passedUsers[ip]) {
+        // lần đầu → đánh dấu đã qua
+        passedUsers[ip] = true;
+    }
+
+    // giữ key 24h
     for (let k in keys) {
         if (keys[k].ip === ip && Date.now() < keys[k].expire) {
             return sendKeyPage(res, k);
