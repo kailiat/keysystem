@@ -71,11 +71,11 @@ function copyKey() {
 
 // GET KEY (GIỮ KEY 24H)
 app.get("/getkey", (req, res) => {
-    const token = req.query.token;
+    const referer = req.headers.referer || "";
 
-    // ❌ chặn truy cập trực tiếp
-    if (!token || token !== "abc123") {
-        return res.send("❌ Access Denied (Go through LootLabs)");
+    // ❌ không đi qua lootlabs
+    if (!referer.includes("lootdest.org")) {
+        return res.send("❌ Please get key through LootLabs");
     }
 
     const ip = req.headers["x-forwarded-for"] || req.socket.remoteAddress;
