@@ -1,19 +1,14 @@
-const express = require("express");
-const app = express();
-
-app.use(express.json());
-
-let keys = {};
-
-// trang chính
-app.get("/", (req, res) => {
-    res.send("Key system is running!");
-});
-
-// GET KEY (UI đẹp + 30s test)
 app.get("/getkey", (req, res) => {
     const ip = req.headers["x-forwarded-for"] || req.socket.remoteAddress;
 
+    // tìm key cũ còn hạn
+    for (let k in keys) {
+        if (keys[k].ip === ip && Date.now() < keys[k].expire) {
+            return sendKeyPage(res, k);
+        }
+    }
+
+    // tạo key mới
     const key = Math.random().toString(36).substring(2, 10).toUpperCase();
 
     keys[key] = {
@@ -21,7 +16,12 @@ app.get("/getkey", (req, res) => {
         expire: Date.now() + 24 * 60 * 60 * 1000
     };
 
-    const html = `
+    return sendKeyPage(res, key);
+});
+
+// function UI đẹp
+function sendKeyPage(res, key) {
+    res.send(`
 <!DOCTYPE html>
 <html>
 <head>
@@ -81,33 +81,5 @@ app.get("/getkey", (req, res) => {
     </script>
 </body>
 </html>
-`;
-
-    res.send(html);
-});
-
-// VERIFY
-app.get("/verify", (req, res) => {
-    const { key } = req.query;
-    const ip = req.headers["x-forwarded-for"] || req.socket.remoteAddress;
-
-    if (!key || !keys[key]) {
-        return res.json({ success: false });
-    }
-
-    if (keys[key].ip !== ip) {
-        return res.json({ success: false });
-    }
-
-    if (Date.now() > keys[key].expire) {
-        delete keys[key];
-        return res.json({ success: false });
-    }
-
-    return res.json({ success: true });
-});
-
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-    console.log("Server running on port " + PORT);
-});
+    `);
+}
