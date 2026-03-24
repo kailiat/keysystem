@@ -72,21 +72,22 @@ function copyKey() {
 // GET KEY (GIỮ KEY 24H)
 app.get("/getkey", (req, res) => {
     const token = req.query.token;
-    const referer = req.headers.referer || "";
+    const ip = req.headers["x-forwarded-for"] || req.socket.remoteAddress;
 
-    // ❌ không có token
     if (!token || token !== "abc123") {
         return res.send("❌ Access Denied");
     }
 
-    // ⚠️ nếu có referer thì check thêm
-    if (referer && !referer.includes("lootdest.org")) {
-        return res.send("❌ Invalid source");
+    // ❗ nếu IP khác → chặn
+    if (keys["LOCK"] && keys["LOCK"] !== ip) {
+        return res.send("❌ Link already used");
     }
 
-    const ip = req.headers["x-forwarded-for"] || req.socket.remoteAddress;
+    // lưu IP đầu tiên
+    if (!keys["LOCK"]) {
+        keys["LOCK"] = ip;
+    }
 
-    // giữ key 24h
     for (let k in keys) {
         if (keys[k].ip === ip && Date.now() < keys[k].expire) {
             return sendKeyPage(res, k);
