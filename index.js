@@ -7,6 +7,11 @@ app.use(express.json());
 let keys = {};
 let passedUsers = {};
 
+// ✅ THÊM DÒNG NÀY (ANTI SLEEP)
+app.get("/ping", (req, res) => {
+    res.send("ok");
+});
+
 // HOME
 app.get("/", (req, res) => {
     res.send("Key system is running!");
@@ -76,21 +81,18 @@ app.get("/getkey", (req, res) => {
     try {
         const token = req.query.token;
 
-        // 🔥 FIX IP CHUẨN (tránh bị đổi key liên tục)
         const ip = (req.headers["x-forwarded-for"] || "").split(",")[0] || req.socket.remoteAddress;
 
         if (!token || token !== "abc123") {
             return res.send("❌ Access Denied");
         }
 
-        // ✅ nếu đã có key → trả lại (KHÔNG đổi key nữa)
         for (let k in keys) {
             if (keys[k].ip === ip && Date.now() < keys[k].expire) {
                 return sendKeyPage(res, k);
             }
         }
 
-        // tạo key mới
         const key = Math.random().toString(36).substring(2, 10).toUpperCase();
 
         keys[key] = {
@@ -110,7 +112,6 @@ app.get("/getkey", (req, res) => {
 app.get("/verify", (req, res) => {
     const { key } = req.query;
 
-    // 🔥 FIX IP giống GETKEY
     const ip = (req.headers["x-forwarded-for"] || "").split(",")[0] || req.socket.remoteAddress;
 
     if (!key || !keys[key]) {
