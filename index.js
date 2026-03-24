@@ -77,7 +77,7 @@ app.get("/getkey", (req, res) => {
         const token = req.query.token;
         const ip = req.headers["x-forwarded-for"] || req.socket.remoteAddress;
 
-        if (!token || token !== "abc123") {
+        if (!token || token !== "fdgf") {
             return res.send("❌ Access Denied");
         }
 
