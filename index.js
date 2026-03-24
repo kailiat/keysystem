@@ -3,7 +3,7 @@ const app = express();
 
 app.use(express.json());
 
-// ✅ QUAN TRỌNG: phải có 2 dòng này
+// DATA
 let keys = {};
 let passedUsers = {};
 
@@ -12,7 +12,7 @@ app.get("/", (req, res) => {
     res.send("Key system is running!");
 });
 
-// UI HIỂN THỊ KEY
+// UI KEY
 function sendKeyPage(res, key) {
     res.send(`<!DOCTYPE html>
 <html>
@@ -75,24 +75,22 @@ function copyKey() {
 app.get("/getkey", (req, res) => {
     try {
         const token = req.query.token;
-        const ip = req.headers["x-forwarded-for"] || req.socket.remoteAddress;
+
+        // 🔥 FIX IP CHUẨN (tránh bị đổi key liên tục)
+        const ip = (req.headers["x-forwarded-for"] || "").split(",")[0] || req.socket.remoteAddress;
 
         if (!token || token !== "abc123") {
             return res.send("❌ Access Denied");
         }
 
-        // đánh dấu user
-        if (!passedUsers[ip]) {
-            passedUsers[ip] = true;
-        }
-
-        // giữ key 24h
+        // ✅ nếu đã có key → trả lại (KHÔNG đổi key nữa)
         for (let k in keys) {
             if (keys[k].ip === ip && Date.now() < keys[k].expire) {
                 return sendKeyPage(res, k);
             }
         }
 
+        // tạo key mới
         const key = Math.random().toString(36).substring(2, 10).toUpperCase();
 
         keys[key] = {
@@ -111,7 +109,9 @@ app.get("/getkey", (req, res) => {
 // VERIFY
 app.get("/verify", (req, res) => {
     const { key } = req.query;
-    const ip = req.headers["x-forwarded-for"] || req.socket.remoteAddress;
+
+    // 🔥 FIX IP giống GETKEY
+    const ip = (req.headers["x-forwarded-for"] || "").split(",")[0] || req.socket.remoteAddress;
 
     if (!key || !keys[key]) {
         return res.json({ success: false });
