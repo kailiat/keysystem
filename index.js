@@ -7,7 +7,7 @@ app.use(express.json());
 let keys = {};
 let passedUsers = {};
 
-// ✅ ANTI SLEEP
+// ANTI SLEEP
 app.get("/ping", (req, res) => {
     res.send("ok");
 });
@@ -76,11 +76,10 @@ function copyKey() {
 </html>`);
 }
 
-// GET KEY
+// GET KEY (KHÔNG CẦN HWID)
 app.get("/getkey", (req, res) => {
     try {
         const token = req.query.token;
-        const hwid = req.query.hwid; // ✅ thêm HWID
 
         const ip = (req.headers["x-forwarded-for"] || "").split(",")[0] || req.socket.remoteAddress;
 
@@ -100,7 +99,6 @@ app.get("/getkey", (req, res) => {
 
         keys[key] = {
             ip: ip,
-            hwid: hwid, // ✅ lưu HWID
             expire: Date.now() + 24 * 60 * 60 * 1000
         };
 
@@ -112,9 +110,9 @@ app.get("/getkey", (req, res) => {
     }
 });
 
-// VERIFY
+// VERIFY (FIX HWID TẠI ĐÂY)
 app.get("/verify", (req, res) => {
-    const { key, hwid } = req.query; // ✅ thêm HWID
+    const { key, hwid } = req.query;
 
     const ip = (req.headers["x-forwarded-for"] || "").split(",")[0] || req.socket.remoteAddress;
 
@@ -127,14 +125,11 @@ app.get("/verify", (req, res) => {
         return res.json({ success: false });
     }
 
-    // ✅ check HWID
-    if (keys[key].hwid && keys[key].hwid !== hwid) {
-        return res.json({ success: false });
-    }
-
-    // ✅ lưu HWID lần đầu
+    // 🔥 FIX CHÍNH Ở ĐÂY
     if (!keys[key].hwid) {
         keys[key].hwid = hwid;
+    } else if (keys[key].hwid !== hwid) {
+        return res.json({ success: false });
     }
 
     // check hết hạn
