@@ -6,7 +6,8 @@ app.use(express.json());
 // DATA
 let keys = {};
 let requests = {};
-let sessions = {}; // session store
+let sessions = {};
+let logs = {};
 
 // ANTI SLEEP
 app.get("/ping", (req, res) => {
@@ -17,6 +18,19 @@ app.get("/ping", (req, res) => {
 app.get("/", (req, res) => {
     res.send("Key system is running!");
 });
+
+// LOG
+function logAction(ip, type) {
+    if (!logs[ip]) {
+        logs[ip] = {
+            getkey: 0,
+            verify: 0
+        };
+    }
+
+    logs[ip][type]++;
+    console.log(`[LOG] ${ip} -> ${type} (${logs[ip][type]})`);
+}
 
 // RATE LIMIT
 function isRateLimited(ip) {
@@ -36,7 +50,7 @@ function isRateLimited(ip) {
     return false;
 }
 
-// CHECKPOINT
+// CHECKPOINT (DÙNG CHUNG CHO TẤT CẢ ADS)
 app.get("/checkpoint", (req, res) => {
     const ip = (req.headers["x-forwarded-for"] || "").split(",")[0] || req.socket.remoteAddress;
 
@@ -44,7 +58,7 @@ app.get("/checkpoint", (req, res) => {
 
     sessions[session] = {
         ip: ip,
-        expire: Date.now() + 10 * 60 * 1000 // 🔥 10 PHÚT
+        expire: Date.now() + 10 * 60 * 1000
     };
 
     res.redirect(`/getkey?session=${session}`);
@@ -116,7 +130,8 @@ app.get("/getkey", (req, res) => {
 
         const ip = (req.headers["x-forwarded-for"] || "").split(",")[0] || req.socket.remoteAddress;
 
-        // CHẶN BYPASS
+        logAction(ip, "getkey");
+
         if (!session || !sessions[session]) {
             return res.send("❌ Invalid session");
         }
@@ -130,21 +145,16 @@ app.get("/getkey", (req, res) => {
             return res.send("❌ Session expired");
         }
 
-        // 🔥 KHÔNG XOÁ SESSION → CHO PHÉP RELOAD
-
-        // ANTI SPAM
         if (isRateLimited(ip)) {
             return res.send("❌ Too many requests");
         }
 
-        // TÌM KEY CŨ
         for (let k in keys) {
             if (keys[k].ip === ip && Date.now() < keys[k].expire) {
                 return sendKeyPage(res, k);
             }
         }
 
-        // TẠO KEY
         const key = Math.random().toString(36).substring(2, 10).toUpperCase();
 
         keys[key] = {
@@ -166,6 +176,8 @@ app.get("/verify", (req, res) => {
 
     const ip = (req.headers["x-forwarded-for"] || "").split(",")[0] || req.socket.remoteAddress;
 
+    logAction(ip, "verify");
+
     if (isRateLimited(ip)) {
         return res.json({ success: false });
     }
@@ -178,7 +190,6 @@ app.get("/verify", (req, res) => {
         return res.json({ success: false });
     }
 
-    // HWID
     if (!keys[key].hwid) {
         keys[key].hwid = hwid;
     } else if (keys[key].hwid !== hwid) {
