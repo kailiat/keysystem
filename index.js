@@ -6,11 +6,9 @@ app.use(express.json());
 // DATA
 let keys = {};
 let passedUsers = {};
+let requests = {}; // anti spam
 
-// 🔥 THÊM DÒNG NÀY (ANTI SPAM DATA)
-let requests = {};
-
-// ✅ THÊM DÒNG NÀY (ANTI SLEEP)
+// ANTI SLEEP
 app.get("/ping", (req, res) => {
     res.send("ok");
 });
@@ -20,7 +18,7 @@ app.get("/", (req, res) => {
     res.send("Key system is running!");
 });
 
-// 🔥 THÊM FUNCTION NÀY (ANTI SPAM)
+// 🔥 RATE LIMIT
 function isRateLimited(ip) {
     const now = Date.now();
 
@@ -104,7 +102,13 @@ app.get("/getkey", (req, res) => {
 
         const ip = (req.headers["x-forwarded-for"] || "").split(",")[0] || req.socket.remoteAddress;
 
-        // 🔥 THÊM DÒNG NÀY (CHẶN SPAM)
+        // 🔥 ANTI BYPASS (CHECK REFERER)
+        const referer = req.headers["referer"] || "";
+        if (!referer.includes("loot-link.com") && !referer.includes("link-center.net")) {
+            return res.send("❌ Access Denied (Bypass detected)");
+        }
+
+        // 🔥 ANTI SPAM
         if (isRateLimited(ip)) {
             return res.send("❌ Too many requests");
         }
@@ -140,7 +144,7 @@ app.get("/verify", (req, res) => {
 
     const ip = (req.headers["x-forwarded-for"] || "").split(",")[0] || req.socket.remoteAddress;
 
-    // 🔥 THÊM DÒNG NÀY (CHẶN SPAM)
+    // ANTI SPAM
     if (isRateLimited(ip)) {
         return res.json({ success: false });
     }
@@ -153,7 +157,7 @@ app.get("/verify", (req, res) => {
         return res.json({ success: false });
     }
 
-    // HWID FIX (GIỮ NGUYÊN)
+    // HWID
     if (!keys[key].hwid) {
         keys[key].hwid = hwid;
     } else if (keys[key].hwid !== hwid) {
