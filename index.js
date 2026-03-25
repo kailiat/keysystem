@@ -105,7 +105,7 @@ app.get("/getkey", (req, res) => {
         // 🔥 ANTI BYPASS (CHECK REFERER)
         const referer = req.headers["referer"] || "";
         if (!referer.includes("loot-link.com") && !referer.includes("link-center.net")) {
-            return res.send("❌ Access Denied (Bypass detected)");
+            return res.send("❌ Access Denied");
         }
 
         // 🔥 ANTI SPAM
