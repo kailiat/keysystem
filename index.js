@@ -18,7 +18,7 @@ app.get("/", (req, res) => {
     res.send("Key system is running!");
 });
 
-// 🔥 RATE LIMIT
+// RATE LIMIT
 function isRateLimited(ip) {
     const now = Date.now();
 
@@ -102,13 +102,13 @@ app.get("/getkey", (req, res) => {
 
         const ip = (req.headers["x-forwarded-for"] || "").split(",")[0] || req.socket.remoteAddress;
 
-        // 🔥 ANTI BYPASS (CHECK REFERER)
+        // 🔥 ANTI BYPASS (SAFE VERSION - ĐÃ FIX)
         const referer = req.headers["referer"] || "";
-        if (!referer.includes("loot-link.com") && !referer.includes("link-center.net")) {
-            return res.send("❌ Access Denied");
+        if (referer && !referer.includes("loot-link.com") && !referer.includes("link-center.net")) {
+            return res.send("❌ Access Denied (Bypass detected)");
         }
 
-        // 🔥 ANTI SPAM
+        // ANTI SPAM
         if (isRateLimited(ip)) {
             return res.send("❌ Too many requests");
         }
