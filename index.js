@@ -7,7 +7,10 @@ app.use(express.json());
 let keys = {};
 let passedUsers = {};
 
-// ANTI SLEEP
+// 🔥 THÊM DÒNG NÀY (ANTI SPAM DATA)
+let requests = {};
+
+// ✅ THÊM DÒNG NÀY (ANTI SLEEP)
 app.get("/ping", (req, res) => {
     res.send("ok");
 });
@@ -16,6 +19,24 @@ app.get("/ping", (req, res) => {
 app.get("/", (req, res) => {
     res.send("Key system is running!");
 });
+
+// 🔥 THÊM FUNCTION NÀY (ANTI SPAM)
+function isRateLimited(ip) {
+    const now = Date.now();
+
+    if (!requests[ip]) {
+        requests[ip] = [];
+    }
+
+    requests[ip] = requests[ip].filter(t => now - t < 10000);
+
+    if (requests[ip].length > 10) {
+        return true;
+    }
+
+    requests[ip].push(now);
+    return false;
+}
 
 // UI KEY
 function sendKeyPage(res, key) {
@@ -76,25 +97,28 @@ function copyKey() {
 </html>`);
 }
 
-// GET KEY (KHÔNG CẦN HWID)
+// GET KEY
 app.get("/getkey", (req, res) => {
     try {
         const token = req.query.token;
 
         const ip = (req.headers["x-forwarded-for"] || "").split(",")[0] || req.socket.remoteAddress;
 
+        // 🔥 THÊM DÒNG NÀY (CHẶN SPAM)
+        if (isRateLimited(ip)) {
+            return res.send("❌ Too many requests");
+        }
+
         if (!token || token !== "abc123") {
             return res.send("❌ Access Denied");
         }
 
-        // nếu đã có key thì trả lại
         for (let k in keys) {
             if (keys[k].ip === ip && Date.now() < keys[k].expire) {
                 return sendKeyPage(res, k);
             }
         }
 
-        // tạo key mới
         const key = Math.random().toString(36).substring(2, 10).toUpperCase();
 
         keys[key] = {
@@ -110,29 +134,32 @@ app.get("/getkey", (req, res) => {
     }
 });
 
-// VERIFY (FIX HWID TẠI ĐÂY)
+// VERIFY
 app.get("/verify", (req, res) => {
     const { key, hwid } = req.query;
 
     const ip = (req.headers["x-forwarded-for"] || "").split(",")[0] || req.socket.remoteAddress;
 
+    // 🔥 THÊM DÒNG NÀY (CHẶN SPAM)
+    if (isRateLimited(ip)) {
+        return res.json({ success: false });
+    }
+
     if (!key || !keys[key]) {
         return res.json({ success: false });
     }
 
-    // check IP
     if (keys[key].ip !== ip) {
         return res.json({ success: false });
     }
 
-    // 🔥 FIX CHÍNH Ở ĐÂY
+    // HWID FIX (GIỮ NGUYÊN)
     if (!keys[key].hwid) {
         keys[key].hwid = hwid;
     } else if (keys[key].hwid !== hwid) {
         return res.json({ success: false });
     }
 
-    // check hết hạn
     if (Date.now() > keys[key].expire) {
         delete keys[key];
         return res.json({ success: false });
