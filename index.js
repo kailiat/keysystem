@@ -6,7 +6,7 @@ app.use(express.json());
 // DATA
 let keys = {};
 let requests = {};
-let sessions = {}; // 🔥 SESSION STORE
+let sessions = {}; // session store
 
 // ANTI SLEEP
 app.get("/ping", (req, res) => {
@@ -36,7 +36,7 @@ function isRateLimited(ip) {
     return false;
 }
 
-// 🔥 CHECKPOINT (PHẢI ĐI QUA ADS)
+// CHECKPOINT
 app.get("/checkpoint", (req, res) => {
     const ip = (req.headers["x-forwarded-for"] || "").split(",")[0] || req.socket.remoteAddress;
 
@@ -44,10 +44,9 @@ app.get("/checkpoint", (req, res) => {
 
     sessions[session] = {
         ip: ip,
-        expire: Date.now() + 2 * 60 * 1000 // 2 phút
+        expire: Date.now() + 10 * 60 * 1000 // 🔥 10 PHÚT
     };
 
-    // redirect sang getkey
     res.redirect(`/getkey?session=${session}`);
 });
 
@@ -110,14 +109,14 @@ function copyKey() {
 </html>`);
 }
 
-// GET KEY (CHỈ NHẬN SESSION)
+// GET KEY
 app.get("/getkey", (req, res) => {
     try {
         const { session } = req.query;
 
         const ip = (req.headers["x-forwarded-for"] || "").split(",")[0] || req.socket.remoteAddress;
 
-        // 🔥 CHẶN BYPASS
+        // CHẶN BYPASS
         if (!session || !sessions[session]) {
             return res.send("❌ Invalid session");
         }
@@ -131,7 +130,7 @@ app.get("/getkey", (req, res) => {
             return res.send("❌ Session expired");
         }
 
-        delete sessions[session]; // dùng 1 lần
+        // 🔥 KHÔNG XOÁ SESSION → CHO PHÉP RELOAD
 
         // ANTI SPAM
         if (isRateLimited(ip)) {
