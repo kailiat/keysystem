@@ -5,8 +5,8 @@ app.use(express.json());
 
 // DATA
 let keys = {};
-let passedUsers = {};
-let requests = {}; // anti spam
+let requests = {};
+let sessions = {}; // 🔥 SESSION STORE
 
 // ANTI SLEEP
 app.get("/ping", (req, res) => {
@@ -35,6 +35,21 @@ function isRateLimited(ip) {
     requests[ip].push(now);
     return false;
 }
+
+// 🔥 CHECKPOINT (PHẢI ĐI QUA ADS)
+app.get("/checkpoint", (req, res) => {
+    const ip = (req.headers["x-forwarded-for"] || "").split(",")[0] || req.socket.remoteAddress;
+
+    const session = Math.random().toString(36).substring(2, 12);
+
+    sessions[session] = {
+        ip: ip,
+        expire: Date.now() + 2 * 60 * 1000 // 2 phút
+    };
+
+    // redirect sang getkey
+    res.redirect(`/getkey?session=${session}`);
+});
 
 // UI KEY
 function sendKeyPage(res, key) {
@@ -95,34 +110,42 @@ function copyKey() {
 </html>`);
 }
 
-// GET KEY
+// GET KEY (CHỈ NHẬN SESSION)
 app.get("/getkey", (req, res) => {
     try {
-        const token = req.query.token;
+        const { session } = req.query;
 
         const ip = (req.headers["x-forwarded-for"] || "").split(",")[0] || req.socket.remoteAddress;
 
-        // 🔥 ANTI BYPASS (SAFE VERSION - ĐÃ FIX)
-        const referer = req.headers["referer"] || "";
-        if (referer && !referer.includes("loot-link.com") && !referer.includes("link-center.net")) {
-            return res.send("❌ Access Denied (Bypass detected)");
+        // 🔥 CHẶN BYPASS
+        if (!session || !sessions[session]) {
+            return res.send("❌ Invalid session");
         }
+
+        if (sessions[session].ip !== ip) {
+            return res.send("❌ Session mismatch");
+        }
+
+        if (Date.now() > sessions[session].expire) {
+            delete sessions[session];
+            return res.send("❌ Session expired");
+        }
+
+        delete sessions[session]; // dùng 1 lần
 
         // ANTI SPAM
         if (isRateLimited(ip)) {
             return res.send("❌ Too many requests");
         }
 
-        if (!token || token !== "abc123") {
-            return res.send("❌ Access Denied");
-        }
-
+        // TÌM KEY CŨ
         for (let k in keys) {
             if (keys[k].ip === ip && Date.now() < keys[k].expire) {
                 return sendKeyPage(res, k);
             }
         }
 
+        // TẠO KEY
         const key = Math.random().toString(36).substring(2, 10).toUpperCase();
 
         keys[key] = {
@@ -144,7 +167,6 @@ app.get("/verify", (req, res) => {
 
     const ip = (req.headers["x-forwarded-for"] || "").split(",")[0] || req.socket.remoteAddress;
 
-    // ANTI SPAM
     if (isRateLimited(ip)) {
         return res.json({ success: false });
     }
