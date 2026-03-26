@@ -4,7 +4,7 @@ const app = express();
 
 app.use(express.json());
 
-// LOAD FILE (FIX RESET)
+// LOAD FILE
 let keys = {};
 try {
     keys = JSON.parse(fs.readFileSync("keys.json"));
@@ -16,6 +16,24 @@ try {
 function saveKeys() {
     fs.writeFileSync("keys.json", JSON.stringify(keys, null, 2));
 }
+
+// 🧹 AUTO CLEAN (MỖI 60 GIÂY)
+setInterval(() => {
+    const now = Date.now();
+    let changed = false;
+
+    for (let k in keys) {
+        if (keys[k].expire && now > keys[k].expire) {
+            delete keys[k];
+            changed = true;
+        }
+    }
+
+    if (changed) {
+        saveKeys();
+        console.log("🧹 Cleaned expired keys");
+    }
+}, 60 * 1000);
 
 // RATE LIMIT
 let requests = {};
@@ -47,7 +65,7 @@ app.get("/", (req, res) => {
     res.send("Key system is running!");
 });
 
-// ✅ GIỮ NGUYÊN UI (CÓ COPY)
+// GUI (GIỮ NGUYÊN)
 function sendKeyPage(res, key) {
     res.send(`<!DOCTYPE html>
 <html>
@@ -106,7 +124,7 @@ function copyKey() {
 </html>`);
 }
 
-// CHECKPOINT (LOOTLABS)
+// CHECKPOINT
 app.get("/checkpoint", (req, res) => {
     const session = Math.random().toString(36).substring(2, 10);
 
@@ -140,10 +158,18 @@ app.get("/getkey", (req, res) => {
         return res.send("❌ Session expired");
     }
 
+    // 🔒 Nếu IP đã có key chưa hết hạn → trả lại key cũ
+    for (let k in keys) {
+        if (keys[k].ip === ip && Date.now() < keys[k].expire) {
+            return sendKeyPage(res, k);
+        }
+    }
+
     const key = Math.random().toString(36).substring(2, 10).toUpperCase();
 
     keys[key] = {
         ip: ip,
+        hwid: null,
         expire: Date.now() + 24 * 60 * 60 * 1000
     };
 
@@ -167,13 +193,18 @@ app.get("/verify", (req, res) => {
         return res.json({ success: false });
     }
 
+    // 🔒 CHỐNG SHARE IP
+    if (keys[key].ip !== ip) {
+        return res.json({ success: false });
+    }
+
     if (Date.now() > keys[key].expire) {
         delete keys[key];
         saveKeys();
         return res.json({ success: false });
     }
 
-    // HWID LOCK
+    // 🔒 HWID LOCK
     if (!keys[key].hwid) {
         keys[key].hwid = hwid;
         saveKeys();
