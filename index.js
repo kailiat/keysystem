@@ -19,13 +19,7 @@ async function connectDB() {
 }
 connectDB();
 
-// 🔥 FAKE keys object để KHÔNG LỖI CODE CŨ
-let keys = {};
-
-// SAVE (GIỮ FUNCTION NHƯNG KHÔNG DÙNG FILE NỮA)
-function saveKeys() {}
-
-// 🧹 AUTO CLEAN (SỬA SANG DB)
+// 🧹 AUTO CLEAN
 setInterval(async () => {
     const now = Date.now();
 
@@ -66,7 +60,7 @@ app.get("/", (req, res) => {
     res.send("Key system is running!");
 });
 
-// GUI (GIỮ NGUYÊN)
+// GUI
 function sendKeyPage(res, key) {
     res.send(`<!DOCTYPE html>
 <html>
@@ -148,7 +142,7 @@ app.get("/getkey", async (req, res) => {
 
     const session = req.query.session;
 
-    const sessionData = await keysCollection.findOne({ key: session });
+    const sessionData = await keysCollection.findOne({ key: session, session: true });
 
     if (!sessionData) {
         return res.send("❌ Invalid session");
@@ -159,9 +153,10 @@ app.get("/getkey", async (req, res) => {
         return res.send("❌ Session expired");
     }
 
-    // 🔒 CHECK KEY CŨ (GIỮ NGUYÊN LOGIC)
+    // 🔒 CHECK KEY CŨ (FIX KHÔNG LẤY NHẦM SESSION)
     const existing = await keysCollection.findOne({
         ip: ip,
+        session: { $ne: true },
         expire: { $gt: Date.now() }
     });
 
@@ -193,14 +188,9 @@ app.get("/verify", async (req, res) => {
         return res.json({ success: false });
     }
 
-    const data = await keysCollection.findOne({ key });
+    const data = await keysCollection.findOne({ key, session: { $ne: true } });
 
     if (!data) {
-        return res.json({ success: false });
-    }
-
-    // 🔒 CHỐNG SHARE IP (GIỮ NGUYÊN)
-    if (data.ip !== ip) {
         return res.json({ success: false });
     }
 
@@ -209,11 +199,13 @@ app.get("/verify", async (req, res) => {
         return res.json({ success: false });
     }
 
-    // 🔒 HWID LOCK (GIỮ NGUYÊN)
+    // 🔥 FIX QUAN TRỌNG: BỎ CHECK IP → KHÔNG HIỆN GUI LẠI
+    // chỉ dùng HWID chống share
+
     if (!data.hwid) {
         await keysCollection.updateOne(
             { key },
-            { $set: { hwid: hwid } }
+            { $set: { hwid: hwid, ip: ip } }
         );
     } else if (data.hwid !== hwid) {
         return res.json({ success: false });
