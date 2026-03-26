@@ -154,7 +154,7 @@ app.get("/getkey", async (req, res) => {
         return res.send("❌ Session expired");
     }
 
-    // 🔥 NÂNG CẤP: CHECK THEO HWID (KHÔNG THEO IP)
+    // 🔥 FIX: XÓA CHECK THEO IP → CHỈ CHECK THEO HWID
     const existing = await keysCollection.findOne({
         hwid: hwid,
         session: { $ne: true },
@@ -169,7 +169,7 @@ app.get("/getkey", async (req, res) => {
 
     await keysCollection.insertOne({
         key: key,
-        ip: ip,
+        ip: ip, // giữ lại để rate limit
         hwid: hwid,
         expire: Date.now() + 24 * 60 * 60 * 1000
     });
