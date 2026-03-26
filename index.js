@@ -129,12 +129,13 @@ app.get("/checkpoint", async (req, res) => {
         expire: Date.now() + 10 * 60 * 1000
     });
 
-    res.redirect(`/getkey?session=${session}`);
+    res.redirect(`/getkey?session=${session}&hwid=${req.query.hwid || ""}`);
 });
 
 // GET KEY
 app.get("/getkey", async (req, res) => {
     const ip = (req.headers["x-forwarded-for"] || "").split(",")[0] || req.socket.remoteAddress;
+    const { hwid } = req.query;
 
     if (isRateLimited(ip)) {
         return res.send("❌ Too many requests");
@@ -153,9 +154,9 @@ app.get("/getkey", async (req, res) => {
         return res.send("❌ Session expired");
     }
 
-    // 🔒 CHECK KEY CŨ (FIX KHÔNG LẤY NHẦM SESSION)
+    // 🔥 NÂNG CẤP: CHECK THEO HWID (KHÔNG THEO IP)
     const existing = await keysCollection.findOne({
-        ip: ip,
+        hwid: hwid,
         session: { $ne: true },
         expire: { $gt: Date.now() }
     });
@@ -169,7 +170,7 @@ app.get("/getkey", async (req, res) => {
     await keysCollection.insertOne({
         key: key,
         ip: ip,
-        hwid: null,
+        hwid: hwid,
         expire: Date.now() + 24 * 60 * 60 * 1000
     });
 
@@ -199,15 +200,8 @@ app.get("/verify", async (req, res) => {
         return res.json({ success: false });
     }
 
-    // 🔥 FIX QUAN TRỌNG: BỎ CHECK IP → KHÔNG HIỆN GUI LẠI
-    // chỉ dùng HWID chống share
-
-    if (!data.hwid) {
-        await keysCollection.updateOne(
-            { key },
-            { $set: { hwid: hwid, ip: ip } }
-        );
-    } else if (data.hwid !== hwid) {
+    // 🔥 CHỐNG SHARE KEY THEO HWID
+    if (data.hwid !== hwid) {
         return res.json({ success: false });
     }
 
