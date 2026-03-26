@@ -154,8 +154,12 @@ app.get("/getkey", async (req, res) => {
         return res.send("❌ Session expired");
     }
 
-    // 🔥 giữ nguyên logic của bạn
-    const existing = null;
+    // ✅ FIX QUAN TRỌNG: giữ key theo IP (web)
+    const existing = await keysCollection.findOne({
+        ip: ip,
+        session: { $ne: true },
+        expire: { $gt: Date.now() }
+    });
 
     if (existing) {
         return sendKeyPage(res, existing.key);
@@ -169,9 +173,6 @@ app.get("/getkey", async (req, res) => {
         hwid: null,
         expire: Date.now() + 24 * 60 * 60 * 1000
     });
-
-    // ❌ ĐÃ XOÁ DÒNG GÂY LỖI:
-    // await keysCollection.deleteOne({ key: session });
 
     return sendKeyPage(res, key);
 });
@@ -197,7 +198,7 @@ app.get("/verify", async (req, res) => {
         return res.json({ success: false });
     }
 
-    // 🔥 CHỐNG SHARE KEY THEO HWID
+    // 🔒 HWID LOCK
     if (!data.hwid) {
         await keysCollection.updateOne(
             { key },
