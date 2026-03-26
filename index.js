@@ -170,7 +170,7 @@ app.get("/getkey", (req, res) => {
     keys[key] = {
         ip: ip,
         hwid: null,
-        expire: Date.now() + 24 * 60 * 60 * 1000
+        expire: Date.now() + 30000 // 30 giây
     };
 
     delete keys[session];
