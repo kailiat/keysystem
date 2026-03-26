@@ -171,7 +171,7 @@ app.get("/getkey", async (req, res) => {
         key: key,
         ip: ip,
         hwid: null,
-        expire: Date.now() + 24 * 60 * 60 * 1000
+        expire: Date.now() + 30 * 1000
     });
 
     return sendKeyPage(res, key);
