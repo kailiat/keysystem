@@ -1,13 +1,42 @@
 const express = require("express");
+const fs = require("fs");
 const app = express();
 
 app.use(express.json());
 
-// DATA
+// 📁 FILE LƯU KEY
+const DATA_FILE = "keys.json";
+
+// LOAD DATA
 let keys = {};
+if (fs.existsSync(DATA_FILE)) {
+    keys = JSON.parse(fs.readFileSync(DATA_FILE));
+}
+
+// SAVE FUNCTION
+function saveKeys() {
+    fs.writeFileSync(DATA_FILE, JSON.stringify(keys, null, 2));
+}
+
+// ANTI SPAM
 let requests = {};
-let sessions = {};
-let logs = {};
+function isRateLimited(ip) {
+    const now = Date.now();
+
+    if (!requests[ip]) {
+        requests[ip] = { count: 1, time: now };
+        return false;
+    }
+
+    if (now - requests[ip].time > 60 * 1000) {
+        requests[ip] = { count: 1, time: now };
+        return false;
+    }
+
+    requests[ip].count++;
+
+    return requests[ip].count > 10;
+}
 
 // ANTI SLEEP
 app.get("/ping", (req, res) => {
@@ -17,51 +46,6 @@ app.get("/ping", (req, res) => {
 // HOME
 app.get("/", (req, res) => {
     res.send("Key system is running!");
-});
-
-// LOG
-function logAction(ip, type) {
-    if (!logs[ip]) {
-        logs[ip] = {
-            getkey: 0,
-            verify: 0
-        };
-    }
-
-    logs[ip][type]++;
-    console.log(`[LOG] ${ip} -> ${type} (${logs[ip][type]})`);
-}
-
-// RATE LIMIT
-function isRateLimited(ip) {
-    const now = Date.now();
-
-    if (!requests[ip]) {
-        requests[ip] = [];
-    }
-
-    requests[ip] = requests[ip].filter(t => now - t < 10000);
-
-    if (requests[ip].length > 10) {
-        return true;
-    }
-
-    requests[ip].push(now);
-    return false;
-}
-
-// CHECKPOINT (DÙNG CHUNG CHO TẤT CẢ ADS)
-app.get("/checkpoint", (req, res) => {
-    const ip = (req.headers["x-forwarded-for"] || "").split(",")[0] || req.socket.remoteAddress;
-
-    const session = Math.random().toString(36).substring(2, 12);
-
-    sessions[session] = {
-        ip: ip,
-        expire: Date.now() + 10 * 60 * 1000
-    };
-
-    res.redirect(`/getkey?session=${session}`);
 });
 
 // UI KEY
@@ -123,30 +107,34 @@ function copyKey() {
 </html>`);
 }
 
+// SESSION (5 phút)
+let sessions = {};
+app.get("/checkpoint", (req, res) => {
+    const ip = (req.headers["x-forwarded-for"] || "").split(",")[0] || req.socket.remoteAddress;
+
+    const session = Math.random().toString(36).substring(2, 10);
+
+    sessions[ip] = {
+        token: session,
+        expire: Date.now() + 5 * 60 * 1000
+    };
+
+    res.redirect(`/getkey?token=${session}`);
+});
+
 // GET KEY
 app.get("/getkey", (req, res) => {
     try {
-        const { session } = req.query;
+        const token = req.query.token;
 
         const ip = (req.headers["x-forwarded-for"] || "").split(",")[0] || req.socket.remoteAddress;
 
-        logAction(ip, "getkey");
-
-        if (!session || !sessions[session]) {
-            return res.send("❌ Invalid session");
-        }
-
-        if (sessions[session].ip !== ip) {
-            return res.send("❌ Session mismatch");
-        }
-
-        if (Date.now() > sessions[session].expire) {
-            delete sessions[session];
-            return res.send("❌ Session expired");
-        }
-
         if (isRateLimited(ip)) {
             return res.send("❌ Too many requests");
+        }
+
+        if (!sessions[ip] || sessions[ip].token !== token || Date.now() > sessions[ip].expire) {
+            return res.send("❌ Invalid session");
         }
 
         for (let k in keys) {
@@ -159,8 +147,11 @@ app.get("/getkey", (req, res) => {
 
         keys[key] = {
             ip: ip,
+            hwid: null,
             expire: Date.now() + 24 * 60 * 60 * 1000
         };
+
+        saveKeys(); // 🔥 SAVE
 
         return sendKeyPage(res, key);
 
@@ -176,8 +167,6 @@ app.get("/verify", (req, res) => {
 
     const ip = (req.headers["x-forwarded-for"] || "").split(",")[0] || req.socket.remoteAddress;
 
-    logAction(ip, "verify");
-
     if (isRateLimited(ip)) {
         return res.json({ success: false });
     }
@@ -190,14 +179,17 @@ app.get("/verify", (req, res) => {
         return res.json({ success: false });
     }
 
-    if (!keys[key].hwid) {
-        keys[key].hwid = hwid;
-    } else if (keys[key].hwid !== hwid) {
+    if (Date.now() > keys[key].expire) {
+        delete keys[key];
+        saveKeys(); // 🔥 SAVE
         return res.json({ success: false });
     }
 
-    if (Date.now() > keys[key].expire) {
-        delete keys[key];
+    // 🔥 HWID FIX
+    if (!keys[key].hwid) {
+        keys[key].hwid = hwid;
+        saveKeys();
+    } else if (keys[key].hwid !== hwid) {
         return res.json({ success: false });
     }
 
