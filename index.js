@@ -10,25 +10,29 @@ const client = new MongoClient(uri);
 
 let keysCollection;
 
-// CONNECT DB
+// CONNECT DB + FIX AUTO CLEAN
 async function connectDB() {
     await client.connect();
     const db = client.db("keysystem");
     keysCollection = db.collection("keys");
     console.log("✅ MongoDB Connected");
+
+    // 🧹 AUTO CLEAN (FIX: chạy sau khi connect + có log)
+    setInterval(async () => {
+        try {
+            const now = Date.now();
+
+            const result = await keysCollection.deleteMany({
+                expire: { $lt: now }
+            });
+
+            console.log("🧹 Cleaned:", result.deletedCount);
+        } catch (err) {
+            console.log("❌ Clean error:", err);
+        }
+    }, 60 * 1000);
 }
 connectDB();
-
-// 🧹 AUTO CLEAN
-setInterval(async () => {
-    const now = Date.now();
-
-    await keysCollection.deleteMany({
-        expire: { $lt: now }
-    });
-
-    console.log("🧹 Cleaned expired keys");
-}, 60 * 1000);
 
 // RATE LIMIT
 let requests = {};
@@ -154,7 +158,7 @@ app.get("/getkey", async (req, res) => {
         return res.send("❌ Session expired");
     }
 
-    // ✅ FIX QUAN TRỌNG: giữ key theo IP (web)
+    // ✅ giữ nguyên logic cũ
     const existing = await keysCollection.findOne({
         ip: ip,
         session: { $ne: true },
