@@ -154,7 +154,7 @@ app.get("/getkey", async (req, res) => {
         return res.send("❌ Session expired");
     }
 
-    // 🔥 FIX: XÓA CHECK THEO IP → CHỈ CHECK THEO HWID
+    // 🔥 giữ nguyên logic của bạn
     const existing = null;
 
     if (existing) {
@@ -164,12 +164,14 @@ app.get("/getkey", async (req, res) => {
     const key = Math.random().toString(36).substring(2, 10).toUpperCase();
 
     await keysCollection.insertOne({
-    key: key,
-    ip: ip,
-    hwid: null,
-    expire: Date.now() + 24 * 60 * 60 * 1000
-});
-    await keysCollection.deleteOne({ key: session });
+        key: key,
+        ip: ip,
+        hwid: null,
+        expire: Date.now() + 24 * 60 * 60 * 1000
+    });
+
+    // ❌ ĐÃ XOÁ DÒNG GÂY LỖI:
+    // await keysCollection.deleteOne({ key: session });
 
     return sendKeyPage(res, key);
 });
@@ -197,13 +199,14 @@ app.get("/verify", async (req, res) => {
 
     // 🔥 CHỐNG SHARE KEY THEO HWID
     if (!data.hwid) {
-    await keysCollection.updateOne(
-        { key },
-        { $set: { hwid: hwid, ip: ip } }
-    );
-} else if (data.hwid !== hwid) {
-    return res.json({ success: false });
-}
+        await keysCollection.updateOne(
+            { key },
+            { $set: { hwid: hwid, ip: ip } }
+        );
+    } else if (data.hwid !== hwid) {
+        return res.json({ success: false });
+    }
+
     return res.json({ success: true });
 });
 
