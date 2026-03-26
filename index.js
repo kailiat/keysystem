@@ -179,7 +179,7 @@ app.get("/getkey", (req, res) => {
     return sendKeyPage(res, key);
 });
 
-// VERIFY
+// VERIFY (🔥 CHỈ SỬA ĐOẠN NÀY)
 app.get("/verify", (req, res) => {
     const { key, hwid } = req.query;
 
@@ -193,10 +193,7 @@ app.get("/verify", (req, res) => {
         return res.json({ success: false });
     }
 
-    // 🔒 CHỐNG SHARE IP
-    if (keys[key].ip !== ip) {
-        return res.json({ success: false });
-    }
+    // ❌ ĐÃ XOÁ CHECK IP CỨNG (FIX LỖI RESET)
 
     if (Date.now() > keys[key].expire) {
         delete keys[key];
@@ -204,7 +201,7 @@ app.get("/verify", (req, res) => {
         return res.json({ success: false });
     }
 
-    // 🔒 HWID LOCK
+    // 🔒 HWID LOCK (GIỮ NGUYÊN)
     if (!keys[key].hwid) {
         keys[key].hwid = hwid;
         saveKeys();
