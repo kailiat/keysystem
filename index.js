@@ -189,24 +189,38 @@ app.get("/verify", (req, res) => {
         return res.json({ success: false });
     }
 
-    if (!key || !keys[key]) {
+    // 🔥 FIX: retry tìm key (tránh render reset)
+    let data = null;
+
+    for (let i = 0; i < 5; i++) {
+        if (key && keys[key]) {
+            data = keys[key];
+            break;
+        }
+
+        // thử reload file
+        try {
+            keys = JSON.parse(fs.readFileSync("keys.json"));
+        } catch {}
+
+        Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, 100); // sleep 100ms
+    }
+
+    if (!data) {
         return res.json({ success: false });
     }
 
-    // ❌ KHÔNG CHECK IP CỨNG NỮA
-
-    if (Date.now() > keys[key].expire) {
+    if (Date.now() > data.expire) {
         delete keys[key];
         saveKeys();
         return res.json({ success: false });
     }
 
-    // 🔥 HWID LOCK + FIX ỔN ĐỊNH
-    if (!keys[key].hwid) {
-        keys[key].hwid = hwid;
-        keys[key].ip = ip; // lưu IP lần đầu (không check cứng)
+    // 🔒 HWID LOCK
+    if (!data.hwid) {
+        data.hwid = hwid;
         saveKeys();
-    } else if (keys[key].hwid !== hwid) {
+    } else if (data.hwid !== hwid) {
         return res.json({ success: false });
     }
 
