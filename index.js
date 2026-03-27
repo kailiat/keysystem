@@ -17,7 +17,7 @@ async function connectDB() {
     keysCollection = db.collection("keys");
     console.log("✅ MongoDB Connected");
 
-    // 🧹 AUTO CLEAN (FIX: chạy sau khi connect + có log)
+    // 🧹 AUTO CLEAN
     setInterval(async () => {
         try {
             const now = Date.now();
@@ -136,10 +136,9 @@ app.get("/checkpoint", async (req, res) => {
     res.redirect(`/getkey?session=${session}&hwid=${req.query.hwid || ""}`);
 });
 
-// GET KEY
+// ✅ GET KEY (FIXED)
 app.get("/getkey", async (req, res) => {
     const ip = (req.headers["x-forwarded-for"] || "").split(",")[0] || req.socket.remoteAddress;
-    const { hwid } = req.query;
 
     if (isRateLimited(ip)) {
         return res.send("❌ Too many requests");
@@ -158,7 +157,7 @@ app.get("/getkey", async (req, res) => {
         return res.send("❌ Session expired");
     }
 
-    // ✅ FIX CHUẨN: kiểm tra key cũ
+    // 🔥 FIX CHÍNH
     const existing = await keysCollection.findOne({
         ip: ip,
         session: { $ne: true }
@@ -166,45 +165,19 @@ app.get("/getkey", async (req, res) => {
 
     if (existing) {
         if (Date.now() > existing.expire) {
-            // 🔥 key hết hạn → xóa luôn
             await keysCollection.deleteOne({ key: existing.key });
         } else {
-            // 🔥 key còn hạn → dùng lại
             return sendKeyPage(res, existing.key);
         }
     }
 
-    // 🔥 tạo key mới
     const key = Math.random().toString(36).substring(2, 10).toUpperCase();
 
     await keysCollection.insertOne({
         key: key,
         ip: ip,
         hwid: null,
-        expire: Date.now() + 60 * 1000
-    });
-
-    return sendKeyPage(res, key);
-});
-
-    // ✅ giữ nguyên logic cũ
-    const existing = await keysCollection.findOne({
-        ip: ip,
-        session: { $ne: true },
-        expire: { $gt: Date.now() }
-    });
-
-    if (existing) {
-        return sendKeyPage(res, existing.key);
-    }
-
-    const key = Math.random().toString(36).substring(2, 10).toUpperCase();
-
-    await keysCollection.insertOne({
-        key: key,
-        ip: ip,
-        hwid: null,
-        expire: Date.now() + 60 * 1000
+        expire: Date.now() + 60 * 1000 // test
     });
 
     return sendKeyPage(res, key);
