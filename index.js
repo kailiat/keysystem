@@ -158,6 +158,35 @@ app.get("/getkey", async (req, res) => {
         return res.send("❌ Session expired");
     }
 
+    // ✅ FIX CHUẨN: kiểm tra key cũ
+    const existing = await keysCollection.findOne({
+        ip: ip,
+        session: { $ne: true }
+    });
+
+    if (existing) {
+        if (Date.now() > existing.expire) {
+            // 🔥 key hết hạn → xóa luôn
+            await keysCollection.deleteOne({ key: existing.key });
+        } else {
+            // 🔥 key còn hạn → dùng lại
+            return sendKeyPage(res, existing.key);
+        }
+    }
+
+    // 🔥 tạo key mới
+    const key = Math.random().toString(36).substring(2, 10).toUpperCase();
+
+    await keysCollection.insertOne({
+        key: key,
+        ip: ip,
+        hwid: null,
+        expire: Date.now() + 60 * 1000
+    });
+
+    return sendKeyPage(res, key);
+});
+
     // ✅ giữ nguyên logic cũ
     const existing = await keysCollection.findOne({
         ip: ip,
