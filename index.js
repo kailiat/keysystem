@@ -156,17 +156,15 @@ app.get("/getkey", async (req, res) => {
         return res.send("❌ Session expired");
     }
 
+    // 🔥 FIX DUY NHẤT (CHỈ LẤY KEY CHƯA HẾT HẠN)
     const existing = await keysCollection.findOne({
         ip: ip,
-        session: { $ne: true }
+        session: { $ne: true },
+        expire: { $gt: Date.now() }
     });
 
     if (existing) {
-        if (Date.now() > existing.expire) {
-            await keysCollection.deleteOne({ key: existing.key });
-        } else {
-            return sendKeyPage(res, existing.key);
-        }
+        return sendKeyPage(res, existing.key);
     }
 
     const key = Math.random().toString(36).substring(2, 10).toUpperCase();
@@ -214,7 +212,7 @@ app.get("/verify", async (req, res) => {
     return res.json({ success: true });
 });
 
-// 🚀 FIX QUAN TRỌNG (KHÔNG CRASH)
+// 🚀 FIX KHÔNG CRASH
 async function startServer() {
     try {
         await connectDB();
