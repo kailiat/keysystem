@@ -156,7 +156,14 @@ app.get("/getkey", async (req, res) => {
         return res.send("❌ Session expired");
     }
 
-    // 🔥 FIX DUY NHẤT (CHỈ LẤY KEY CHƯA HẾT HẠN)
+    // 🔥 FIX 1: XÓA LUÔN KEY HẾT HẠN CỦA IP (QUAN TRỌNG NHẤT)
+    await keysCollection.deleteMany({
+        ip: ip,
+        session: { $ne: true },
+        expire: { $lt: Date.now() }
+    });
+
+    // 🔥 FIX 2: CHỈ LẤY KEY CÒN HẠN
     const existing = await keysCollection.findOne({
         ip: ip,
         session: { $ne: true },
@@ -212,7 +219,7 @@ app.get("/verify", async (req, res) => {
     return res.json({ success: true });
 });
 
-// 🚀 FIX KHÔNG CRASH
+// START SERVER
 async function startServer() {
     try {
         await connectDB();
