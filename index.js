@@ -10,7 +10,7 @@ const client = new MongoClient(uri);
 
 let keysCollection;
 
-// CONNECT DB + FIX AUTO CLEAN
+// CONNECT DB
 async function connectDB() {
     await client.connect();
     const db = client.db("keysystem");
@@ -20,8 +20,6 @@ async function connectDB() {
     // 🧹 AUTO CLEAN
     setInterval(async () => {
         try {
-            if (!keysCollection) return; // FIX crash
-
             const now = Date.now();
 
             const result = await keysCollection.deleteMany({
@@ -34,7 +32,6 @@ async function connectDB() {
         }
     }, 60 * 1000);
 }
-connectDB();
 
 // RATE LIMIT
 let requests = {};
@@ -66,7 +63,7 @@ app.get("/", (req, res) => {
     res.send("Key system is running!");
 });
 
-// GUI (GIỮ NGUYÊN 100%)
+// GUI
 function sendKeyPage(res, key) {
     res.send(`<!DOCTYPE html>
 <html>
@@ -127,8 +124,6 @@ function copyKey() {
 
 // CHECKPOINT
 app.get("/checkpoint", async (req, res) => {
-    if (!keysCollection) return res.send("⚠️ Server warming up..."); // FIX
-
     const session = Math.random().toString(36).substring(2, 10);
 
     await keysCollection.insertOne({
@@ -142,8 +137,6 @@ app.get("/checkpoint", async (req, res) => {
 
 // GET KEY
 app.get("/getkey", async (req, res) => {
-    if (!keysCollection) return res.send("⚠️ Server warming up..."); // FIX
-
     const ip = (req.headers["x-forwarded-for"] || "").split(",")[0] || req.socket.remoteAddress;
 
     if (isRateLimited(ip)) {
@@ -190,8 +183,6 @@ app.get("/getkey", async (req, res) => {
 
 // VERIFY
 app.get("/verify", async (req, res) => {
-    if (!keysCollection) return res.json({ success: false }); // FIX
-
     const { key, hwid } = req.query;
 
     const ip = (req.headers["x-forwarded-for"] || "").split(",")[0] || req.socket.remoteAddress;
@@ -223,7 +214,17 @@ app.get("/verify", async (req, res) => {
     return res.json({ success: true });
 });
 
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-    console.log("🚀 Server running");
-});
+// 🚀 FIX QUAN TRỌNG (KHÔNG CRASH)
+async function startServer() {
+    try {
+        await connectDB();
+        const PORT = process.env.PORT || 3000;
+        app.listen(PORT, () => {
+            console.log("🚀 Server running");
+        });
+    } catch (err) {
+        console.error("❌ Failed to start:", err);
+    }
+}
+
+startServer();
