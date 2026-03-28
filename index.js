@@ -12,26 +12,32 @@ let keysCollection;
 
 // CONNECT DB + FIX AUTO CLEAN
 async function connectDB() {
-    await client.connect();
-    const db = client.db("keysystem");
-    keysCollection = db.collection("keys");
-    console.log("✅ MongoDB Connected");
+    try {
+        await client.connect();
+        const db = client.db("keysystem");
+        keysCollection = db.collection("keys");
+        console.log("✅ MongoDB Connected");
 
-    // 🧹 AUTO CLEAN
-    setInterval(async () => {
-        try {
-            const now = Date.now();
+        // 🧹 AUTO CLEAN
+        setInterval(async () => {
+            try {
+                const now = Date.now();
 
-            const result = await keysCollection.deleteMany({
-                expire: { $lt: now }
-            });
+                const result = await keysCollection.deleteMany({
+                    expire: { $lt: now }
+                });
 
-            console.log("🧹 Cleaned:", result.deletedCount);
-        } catch (err) {
-            console.log("❌ Clean error:", err);
-        }
-    }, 60 * 1000);
+                console.log("🧹 Cleaned:", result.deletedCount);
+            } catch (err) {
+                console.log("❌ Clean error:", err);
+            }
+        }, 60 * 1000);
+
+    } catch (err) {
+        console.log("❌ MongoDB ERROR:", err);
+    }
 }
+
 connectDB();
 
 // RATE LIMIT
@@ -136,7 +142,7 @@ app.get("/checkpoint", async (req, res) => {
     res.redirect(`/getkey?session=${session}&hwid=${req.query.hwid || ""}`);
 });
 
-// ✅ GET KEY (FIXED)
+// ✅ GET KEY
 app.get("/getkey", async (req, res) => {
     const ip = (req.headers["x-forwarded-for"] || "").split(",")[0] || req.socket.remoteAddress;
 
@@ -157,7 +163,6 @@ app.get("/getkey", async (req, res) => {
         return res.send("❌ Session expired");
     }
 
-    // 🔥 FIX CHÍNH
     const existing = await keysCollection.findOne({
         ip: ip,
         session: { $ne: true }
