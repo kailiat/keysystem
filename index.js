@@ -10,6 +10,17 @@ const client = new MongoClient(uri);
 
 let keysCollection;
 
+// ✅ SAFE GET IP (FIX CRASH)
+function getIP(req) {
+    try {
+        let ip = (req.headers["x-forwarded-for"] || "").split(",")[0] || req.socket.remoteAddress || "unknown";
+        if (ip.includes("::ffff:")) ip = ip.replace("::ffff:", "");
+        return ip;
+    } catch {
+        return "unknown";
+    }
+}
+
 // CONNECT DB
 async function connectDB() {
     await client.connect();
@@ -17,9 +28,11 @@ async function connectDB() {
     keysCollection = db.collection("keys");
     console.log("✅ MongoDB Connected");
 
-    // 🧹 AUTO CLEAN
+    // 🧹 AUTO CLEAN (SAFE)
     setInterval(async () => {
         try {
+            if (!keysCollection) return;
+
             const now = Date.now();
 
             const result = await keysCollection.deleteMany({
@@ -28,7 +41,7 @@ async function connectDB() {
 
             console.log("🧹 Cleaned:", result.deletedCount);
         } catch (err) {
-            console.log("❌ Clean error:", err);
+            console.log("❌ Clean error:", err.message);
         }
     }, 60 * 1000);
 }
@@ -37,20 +50,24 @@ async function connectDB() {
 let requests = {};
 
 function isRateLimited(ip) {
-    const now = Date.now();
+    try {
+        const now = Date.now();
 
-    if (!requests[ip]) {
-        requests[ip] = [];
+        if (!requests[ip]) {
+            requests[ip] = [];
+        }
+
+        requests[ip] = requests[ip].filter(t => now - t < 10000);
+
+        if (requests[ip].length >= 5) {
+            return true;
+        }
+
+        requests[ip].push(now);
+        return false;
+    } catch {
+        return false;
     }
-
-    requests[ip] = requests[ip].filter(t => now - t < 10000);
-
-    if (requests[ip].length >= 5) {
-        return true;
-    }
-
-    requests[ip].push(now);
-    return false;
 }
 
 // ANTI SLEEP
@@ -63,7 +80,7 @@ app.get("/", (req, res) => {
     res.send("Key system is running!");
 });
 
-// GUI
+// GUI (GIỮ NGUYÊN)
 function sendKeyPage(res, key) {
     res.send(`<!DOCTYPE html>
 <html>
@@ -124,99 +141,119 @@ function copyKey() {
 
 // CHECKPOINT
 app.get("/checkpoint", async (req, res) => {
-    const session = Math.random().toString(36).substring(2, 10);
+    try {
+        const session = Math.random().toString(36).substring(2, 10);
 
-    await keysCollection.insertOne({
-        key: session,
-        session: true,
-        expire: Date.now() + 10 * 60 * 1000
-    });
+        await keysCollection.insertOne({
+            key: session,
+            session: true,
+            expire: Date.now() + 10 * 60 * 1000
+        });
 
-    res.redirect(`/getkey?session=${session}&hwid=${req.query.hwid || ""}`);
+        res.redirect(`/getkey?session=${session}&hwid=${req.query.hwid || ""}`);
+    } catch {
+        res.send("❌ Server error");
+    }
 });
 
 // GET KEY
 app.get("/getkey", async (req, res) => {
-    const ip = (req.headers["x-forwarded-for"] || "").split(",")[0] || req.socket.remoteAddress;
+    try {
+        const ip = getIP(req);
 
-    if (isRateLimited(ip)) {
-        return res.send("❌ Too many requests");
+        if (isRateLimited(ip)) {
+            return res.send("❌ Too many requests");
+        }
+
+        const session = req.query.session;
+
+        const sessionData = await keysCollection.findOne({ key: session, session: true });
+
+        if (!sessionData) {
+            return res.send("❌ Invalid session");
+        }
+
+        if (Date.now() > sessionData.expire) {
+            await keysCollection.deleteOne({ key: session });
+            return res.send("❌ Session expired");
+        }
+
+        await keysCollection.deleteMany({
+            ip: ip,
+            session: { $ne: true },
+            expire: { $lt: Date.now() }
+        });
+
+        const existing = await keysCollection.findOne({
+            ip: ip,
+            session: { $ne: true },
+            expire: { $gt: Date.now() }
+        });
+
+        if (existing) {
+            return sendKeyPage(res, existing.key);
+        }
+
+        const key = Math.random().toString(36).substring(2, 10).toUpperCase();
+
+        await keysCollection.insertOne({
+            key: key,
+            ip: ip,
+            hwid: null,
+            expire: Date.now() + 24 * 60 * 60 * 1000
+        });
+
+        return sendKeyPage(res, key);
+
+    } catch {
+        return res.send("❌ Server error");
     }
-
-    const session = req.query.session;
-
-    const sessionData = await keysCollection.findOne({ key: session, session: true });
-
-    if (!sessionData) {
-        return res.send("❌ Invalid session");
-    }
-
-    if (Date.now() > sessionData.expire) {
-        await keysCollection.deleteOne({ key: session });
-        return res.send("❌ Session expired");
-    }
-
-    // 🔥 FIX 1: XÓA LUÔN KEY HẾT HẠN CỦA IP (QUAN TRỌNG NHẤT)
-    await keysCollection.deleteMany({
-        ip: ip,
-        session: { $ne: true },
-        expire: { $lt: Date.now() }
-    });
-
-    // 🔥 FIX 2: CHỈ LẤY KEY CÒN HẠN
-    const existing = await keysCollection.findOne({
-        ip: ip,
-        session: { $ne: true },
-        expire: { $gt: Date.now() }
-    });
-
-    if (existing) {
-        return sendKeyPage(res, existing.key);
-    }
-
-    const key = Math.random().toString(36).substring(2, 10).toUpperCase();
-
-    await keysCollection.insertOne({
-        key: key,
-        ip: ip,
-        hwid: null,
-        expire: Date.now() + 24 * 60 * 60 * 1000
-    });
-
-    return sendKeyPage(res, key);
 });
 
 // VERIFY
 app.get("/verify", async (req, res) => {
-    const { key, hwid } = req.query;
+    try {
+        const { key, hwid } = req.query;
+        const ip = getIP(req);
 
-    const ip = (req.headers["x-forwarded-for"] || "").split(",")[0] || req.socket.remoteAddress;
+        if (isRateLimited(ip)) {
+            return res.json({ success: false });
+        }
 
-    if (isRateLimited(ip)) {
+        const data = await keysCollection.findOne({ key, session: { $ne: true } });
+
+        if (!data) {
+            return res.json({ success: false });
+        }
+
+        if (Date.now() > data.expire) {
+            await keysCollection.deleteOne({ key });
+            return res.json({ success: false });
+        }
+
+        if (!data.hwid) {
+            await keysCollection.updateOne(
+                { key },
+                { $set: { hwid: hwid, ip: ip } }
+            );
+        } else if (data.hwid !== hwid) {
+            return res.json({ success: false });
+        }
+
+        return res.json({ success: true });
+
+    } catch {
         return res.json({ success: false });
     }
+});
 
-    const data = await keysCollection.findOne({ key, session: { $ne: true } });
+// 🔥 CHỐNG CRASH TOÀN SERVER
+process.on("uncaughtException", (err) => {
+    console.error("💥 Uncaught:", err);
+});
 
-    if (!data) {
-        return res.json({ success: false });
-    }
-
-    if (Date.now() > data.expire) {
-        await keysCollection.deleteOne({ key });
-        return res.json({ success: false });
-    }
-
-    if (!data.hwid) {
-        await keysCollection.updateOne(
-            { key },
-            { $set: { hwid: hwid, ip: ip } }
-        );
-    } else if (data.hwid !== hwid) {
-        return res.json({ success: false });
-    }
-
-    return res.json({ success: true });
+process.on("unhandledRejection", (err) => {
+    console.error("💥 Rejection:", err);
 });
 
 // START SERVER
