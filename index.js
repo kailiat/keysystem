@@ -268,5 +268,58 @@ async function startServer() {
         console.error("❌ Failed to start:", err);
     }
 }
+app.get("/test-start", (req, res) => {
+    res.redirect("/start?target=/test-finish");
+});
+app.get("/test-finish", (req, res) => {
+    res.send(`
+    <html>
+    <body style="background:black;color:white;display:flex;justify-content:center;align-items:center;height:100vh;">
+        <h2>Test Finish - waiting 3s...</h2>
 
+        <script>
+        setTimeout(() => {
+            window.location.href = "/checkpoint";
+        }, 3000);
+        </script>
+    </body>
+    </html>
+    `);
+});
+app.get("/start", (req, res) => {
+    const target = req.query.target;
+
+    res.send(`
+    <html>
+    <body style="background:#111;color:white;display:flex;justify-content:center;align-items:center;height:100vh;font-family:Arial;">
+        <div style="text-align:center;">
+            <h2>Checking...</h2>
+            <p id="text">Wait 5 seconds</p>
+            <button id="btn" disabled>Continue</button>
+        </div>
+
+        <script>
+        let t = 5;
+        let btn = document.getElementById("btn");
+        let text = document.getElementById("text");
+
+        let i = setInterval(() => {
+            t--;
+            text.innerText = "Wait " + t + " seconds";
+
+            if(t <= 0){
+                clearInterval(i);
+                text.innerText = "Ready!";
+                btn.disabled = false;
+            }
+        }, 1000);
+
+        btn.onclick = () => {
+            window.location.href = target;
+        }
+        </script>
+    </body>
+    </html>
+    `);
+});
 startServer();
