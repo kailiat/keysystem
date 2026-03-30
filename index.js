@@ -270,10 +270,9 @@ async function startServer() {
 }
 
 // =======================
-// 🔥 START PAGE (FIX LỖI ĐỨNG)
+// 🔥 START PAGE (FIX FULL - KHÔNG DÙNG TARGET)
 // =======================
 app.get("/start", (req, res) => {
-    const target = req.query.target;
 
     res.send(`
     <html>
@@ -358,11 +357,13 @@ app.get("/start", (req, res) => {
 
         btn.onclick = () => {
 
+            // 👉 lần 2 → đi luôn
             if (started) {
-                window.location.href = target;
+                window.location.href = "/finish";
                 return;
             }
 
+            // 👉 lần 1 → chạy countdown
             started = true;
             btn.disabled = true;
 
