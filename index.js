@@ -333,6 +333,12 @@ app.get("/start", (req, res) => {
     </head>
 
     <body>
+
+        <!-- 🔥 BRAND -->
+        <div style="position:absolute; top:20px; text-align:center; width:100%; font-size:13px; letter-spacing:1px; color:#6366f1; opacity:0.8;">
+            SHIBA • GET KEY
+        </div>
+
         <div class="box">
             <h2>Verification Step</h2>
             <p>Click continue to verify</p>
@@ -376,8 +382,9 @@ app.get("/start", (req, res) => {
     `);
 });
 
+
 // =======================
-// 🔥 FINISH PAGE (giống START nhưng nội dung khác)
+// 🔥 FINISH PAGE
 // =======================
 app.get("/finish", (req, res) => {
     res.send(`
@@ -428,6 +435,12 @@ app.get("/finish", (req, res) => {
     </head>
 
     <body>
+
+        <!-- 🔥 BRAND -->
+        <div style="position:absolute; top:20px; text-align:center; width:100%; font-size:13px; letter-spacing:1px; color:#6366f1; opacity:0.8;">
+            SHIBA • GET KEY
+        </div>
+
         <div class="box">
             <h2>Generating Key...</h2>
             <p id="text">Preparing your access</p>
