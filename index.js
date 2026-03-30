@@ -268,5 +268,152 @@ async function startServer() {
         console.error("❌ Failed to start:", err);
     }
 }
+// =======================
+// 🔥 START PAGE (5s delay)
+// =======================
+app.get("/start", (req, res) => {
+    const target = req.query.target;
 
+    res.send(`
+    <html>
+    <head>
+    <style>
+    body {
+        margin:0;
+        background: #0f172a;
+        color: white;
+        font-family: Arial;
+        display:flex;
+        justify-content:center;
+        align-items:center;
+        height:100vh;
+    }
+    .box {
+        background:#1e293b;
+        padding:30px;
+        border-radius:15px;
+        text-align:center;
+        width:300px;
+    }
+    button {
+        margin-top:15px;
+        padding:10px 20px;
+        border:none;
+        border-radius:10px;
+        background:#6366f1;
+        color:white;
+        cursor:pointer;
+        font-size:15px;
+    }
+    button:disabled {
+        opacity:0.5;
+        cursor:not-allowed;
+    }
+    </style>
+    </head>
+
+    <body>
+        <div class="box">
+            <h2>Verifying...</h2>
+            <p id="text">Please wait 5 seconds</p>
+            <button id="btn" disabled>Continue</button>
+        </div>
+
+        <script>
+        let t = 5;
+        let btn = document.getElementById("btn");
+        let text = document.getElementById("text");
+
+        let i = setInterval(() => {
+            t--;
+            text.innerText = "Please wait " + t + " seconds";
+
+            if(t <= 0){
+                clearInterval(i);
+                text.innerText = "Ready!";
+                btn.disabled = false;
+            }
+        }, 1000);
+
+        btn.onclick = () => {
+            window.location.href = target;
+        }
+        </script>
+    </body>
+    </html>
+    `);
+});
+
+// =======================
+// 🔥 FINISH PAGE (3s delay)
+// =======================
+app.get("/finish", (req, res) => {
+    res.send(`
+    <html>
+    <head>
+    <style>
+    body {
+        margin:0;
+        background:#0f172a;
+        color:white;
+        font-family:Arial;
+        display:flex;
+        justify-content:center;
+        align-items:center;
+        height:100vh;
+    }
+    .box {
+        background:#1e293b;
+        padding:30px;
+        border-radius:15px;
+        text-align:center;
+        width:300px;
+    }
+    button {
+        margin-top:15px;
+        padding:10px 20px;
+        border:none;
+        border-radius:10px;
+        background:#22c55e;
+        color:white;
+        cursor:pointer;
+        font-size:15px;
+    }
+    button:disabled {
+        opacity:0.5;
+    }
+    </style>
+    </head>
+
+    <body>
+        <div class="box">
+            <h2>Almost Done...</h2>
+            <p id="text">Finalizing...</p>
+            <button id="btn" disabled>Get Key</button>
+        </div>
+
+        <script>
+        let t = 3;
+        let btn = document.getElementById("btn");
+        let text = document.getElementById("text");
+
+        let i = setInterval(() => {
+            t--;
+            text.innerText = "Finalizing... " + t;
+
+            if(t <= 0){
+                clearInterval(i);
+                text.innerText = "Ready!";
+                btn.disabled = false;
+            }
+        }, 1000);
+
+        btn.onclick = () => {
+            window.location.href = "/checkpoint";
+        }
+        </script>
+    </body>
+    </html>
+    `);
+});
 startServer();
