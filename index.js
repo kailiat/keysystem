@@ -280,7 +280,7 @@ app.get("/start", (req, res) => {
     <style>
     body {
         margin:0;
-        background: #0f172a;
+        background: radial-gradient(circle at top, #0f172a, #020617);
         color: white;
         font-family: Arial;
         display:flex;
@@ -290,53 +290,85 @@ app.get("/start", (req, res) => {
     }
     .box {
         background:#1e293b;
-        padding:30px;
-        border-radius:15px;
+        padding:35px;
+        border-radius:18px;
         text-align:center;
-        width:300px;
+        width:320px;
+        box-shadow: 0 0 40px rgba(99,102,241,0.2);
+    }
+    h2 {
+        margin-bottom:10px;
+    }
+    p {
+        color:#94a3b8;
+        font-size:14px;
     }
     button {
-        margin-top:15px;
-        padding:10px 20px;
+        margin-top:20px;
+        padding:12px 25px;
         border:none;
-        border-radius:10px;
+        border-radius:12px;
         background:#6366f1;
         color:white;
         cursor:pointer;
         font-size:15px;
+        transition:0.2s;
     }
     button:disabled {
-        opacity:0.5;
+        background:#374151;
         cursor:not-allowed;
+    }
+    button:hover:not(:disabled){
+        transform:scale(1.05);
+    }
+    .bar {
+        height:5px;
+        width:0%;
+        background:#6366f1;
+        border-radius:10px;
+        margin-top:15px;
+        transition:width 1s linear;
     }
     </style>
     </head>
 
     <body>
         <div class="box">
-            <h2>Verifying...</h2>
-            <p id="text">Please wait 5 seconds</p>
-            <button id="btn" disabled>Continue</button>
+            <h2>Security Check</h2>
+            <p>Click continue to verify</p>
+
+            <button id="btn">Continue</button>
+            <div class="bar" id="bar"></div>
         </div>
 
         <script>
-        let t = 5;
         let btn = document.getElementById("btn");
-        let text = document.getElementById("text");
-
-        let i = setInterval(() => {
-            t--;
-            text.innerText = "Please wait " + t + " seconds";
-
-            if(t <= 0){
-                clearInterval(i);
-                text.innerText = "Ready!";
-                btn.disabled = false;
-            }
-        }, 1000);
+        let bar = document.getElementById("bar");
 
         btn.onclick = () => {
-            window.location.href = target;
+            btn.disabled = true;
+
+            let t = 5;
+            btn.innerText = "Wait " + t + "s";
+
+            let i = setInterval(() => {
+                t--;
+                bar.style.width = ((5 - t) * 20) + "%";
+
+                if(t > 0){
+                    btn.innerText = "Wait " + t + "s";
+                }
+
+                if(t <= 0){
+                    clearInterval(i);
+                    btn.innerText = "Continue";
+                    btn.disabled = false;
+
+                    btn.onclick = () => {
+                        window.location.href = target;
+                    }
+                }
+            }, 1000);
         }
         </script>
     </body>
