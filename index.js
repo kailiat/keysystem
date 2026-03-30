@@ -270,7 +270,7 @@ async function startServer() {
 }
 
 // =======================
-// 🔥 START PAGE (FIX BUG 1s)
+// 🔥 START PAGE (FIX LỖI ĐỨNG)
 // =======================
 app.get("/start", (req, res) => {
     const target = req.query.target;
@@ -283,7 +283,7 @@ app.get("/start", (req, res) => {
         margin:0;
         background: radial-gradient(circle at top, #0f172a, #020617);
         color: white;
-        font-family: 'Segoe UI', sans-serif;
+        font-family: Arial;
         display:flex;
         justify-content:center;
         align-items:center;
@@ -294,14 +294,14 @@ app.get("/start", (req, res) => {
         padding:35px;
         border-radius:18px;
         text-align:center;
-        width:340px;
-        box-shadow: 0 0 50px rgba(99,102,241,0.25);
+        width:320px;
+        box-shadow: 0 0 40px rgba(99,102,241,0.2);
     }
-    .brand {
-        font-size:20px;
+    .logo {
+        font-size:18px;
         font-weight:600;
         margin-bottom:10px;
-        color:#818cf8;
+        color:#a5b4fc;
     }
     h2 {
         margin-bottom:10px;
@@ -341,7 +341,7 @@ app.get("/start", (req, res) => {
 
     <body>
         <div class="box">
-            <div class="brand">Shiba - Get Key</div>
+            <div class="logo">Shiba - Get Key</div>
 
             <h2>Verification Step</h2>
             <p>Click continue to verify</p>
@@ -354,28 +354,35 @@ app.get("/start", (req, res) => {
         let btn = document.getElementById("btn");
         let bar = document.getElementById("bar");
 
+        let started = false;
+
         btn.onclick = () => {
+
+            if (started) {
+                window.location.href = target;
+                return;
+            }
+
+            started = true;
             btn.disabled = true;
 
             let t = 5;
-            let total = 5;
-
             btn.innerText = "Wait " + t + "s";
 
             let i = setInterval(() => {
                 t--;
-
-                bar.style.width = ((total - t) / total * 100) + "%";
+                bar.style.width = ((5 - t) * 20) + "%";
 
                 if (t > 0) {
                     btn.innerText = "Wait " + t + "s";
-                } else {
-                    clearInterval(i);
-                    btn.innerText = "Loading...";
+                }
 
-                    setTimeout(() => {
-                        window.location.href = target;
-                    }, 300);
+                if (t <= 0) {
+                    clearInterval(i);
+                    bar.style.width = "100%";
+
+                    btn.innerText = "Continue";
+                    btn.disabled = false;
                 }
             }, 1000);
         }
