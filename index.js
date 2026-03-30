@@ -377,7 +377,7 @@ app.get("/start", (req, res) => {
 });
 
 // =======================
-// 🔥 FINISH PAGE (3s delay)
+// 🔥 FINISH PAGE (giống START nhưng nội dung khác)
 // =======================
 app.get("/finish", (req, res) => {
     res.send(`
@@ -386,9 +386,9 @@ app.get("/finish", (req, res) => {
     <style>
     body {
         margin:0;
-        background:#0f172a;
-        color:white;
-        font-family:Arial;
+        background: #0f172a;
+        color: white;
+        font-family: Arial;
         display:flex;
         justify-content:center;
         align-items:center;
@@ -400,6 +400,7 @@ app.get("/finish", (req, res) => {
         border-radius:15px;
         text-align:center;
         width:300px;
+        box-shadow: 0 0 40px rgba(99,102,241,0.2);
     }
     button {
         margin-top:15px;
@@ -413,28 +414,45 @@ app.get("/finish", (req, res) => {
     }
     button:disabled {
         opacity:0.5;
+        cursor:not-allowed;
+    }
+    .bar {
+        height:4px;
+        background:#6366f1;
+        margin-top:15px;
+        border-radius:10px;
+        width:0%;
+        transition: width 1s linear;
     }
     </style>
     </head>
 
     <body>
         <div class="box">
-            <h2>Almost Done...</h2>
-            <p id="text">Finalizing...</p>
+            <h2>Generating Key...</h2>
+            <p id="text">Preparing your access</p>
             <button id="btn" disabled>Get Key</button>
+            <div class="bar" id="bar"></div>
         </div>
 
         <script>
         let t = 3;
         let btn = document.getElementById("btn");
         let text = document.getElementById("text");
+        let bar = document.getElementById("bar");
+
+        let progress = 0;
 
         let i = setInterval(() => {
             t--;
-            text.innerText = "Finalizing... " + t;
+            progress += 33;
+            bar.style.width = progress + "%";
+
+            text.innerText = "Generating key... " + t;
 
             if(t <= 0){
                 clearInterval(i);
+                bar.style.width = "100%";
                 text.innerText = "Ready!";
                 btn.disabled = false;
             }
