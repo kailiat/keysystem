@@ -334,7 +334,7 @@ app.get("/start", (req, res) => {
 
     <body>
         <div class="box">
-            <h2>Security Check</h2>
+            <h2>Verification Step</h2>
             <p>Click continue to verify</p>
 
             <button id="btn">Continue</button>
