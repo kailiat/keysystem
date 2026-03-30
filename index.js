@@ -357,9 +357,26 @@ app.get("/start", (req, res) => {
 
         btn.onclick = () => {
 
-            // 👉 lần 2 → đi luôn
+            // 👉 lần 2 → đi ads (đã sửa)
             if (started) {
-                window.location.href = "/finish";
+
+                const params = new URLSearchParams(window.location.search);
+                const type = params.get("type");
+
+                let url = null;
+
+                if (type === "lv") {
+                    url = "https://link-target.net/4248703/NMAFeKXYONqb";
+                } else if (type === "ll") {
+                    url = "https://loot-link.com/s?i55LYZnQ";
+                }
+
+                if (!url) {
+                    alert("Invalid link");
+                    return;
+                }
+
+                window.location.href = url;
                 return;
             }
 
