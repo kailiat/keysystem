@@ -394,7 +394,7 @@ app.get("/start", (req, res) => {
 });
 
 // =======================
-// 🔥 FINISH PAGE
+// 🔥 FINISH PAGE (CLICK → 3s → CLICK AGAIN)
 // =======================
 app.get("/finish", (req, res) => {
     res.send(`
@@ -405,7 +405,7 @@ app.get("/finish", (req, res) => {
         margin:0;
         background: radial-gradient(circle at top, #0f172a, #020617);
         color:white;
-        font-family:'Segoe UI', sans-serif;
+        font-family: Arial;
         display:flex;
         justify-content:center;
         align-items:center;
@@ -416,14 +416,21 @@ app.get("/finish", (req, res) => {
         padding:35px;
         border-radius:18px;
         text-align:center;
-        width:340px;
-        box-shadow: 0 0 50px rgba(99,102,241,0.25);
+        width:320px;
+        box-shadow: 0 0 40px rgba(99,102,241,0.2);
     }
-    .brand {
-        font-size:20px;
+    .logo {
+        font-size:18px;
         font-weight:600;
         margin-bottom:10px;
-        color:#22c55e;
+        color:#a5b4fc;
+    }
+    h2 {
+        margin-bottom:10px;
+    }
+    p {
+        color:#94a3b8;
+        font-size:14px;
     }
     button {
         margin-top:20px;
@@ -434,9 +441,14 @@ app.get("/finish", (req, res) => {
         color:white;
         cursor:pointer;
         font-size:15px;
+        transition:0.2s;
     }
     button:disabled {
         background:#374151;
+        cursor:not-allowed;
+    }
+    button:hover:not(:disabled){
+        transform:scale(1.05);
     }
     .bar {
         height:5px;
@@ -451,10 +463,10 @@ app.get("/finish", (req, res) => {
 
     <body>
         <div class="box">
-            <div class="brand">Shiba - Get Key</div>
+            <div class="logo">Shiba - Get Key</div>
 
-            <h2>Generate Key</h2>
-            <p>Click to finish and receive your key</p>
+            <h2>Generating Key...</h2>
+            <p>Click button to finish</p>
 
             <button id="btn">Get Key</button>
             <div class="bar" id="bar"></div>
@@ -464,7 +476,18 @@ app.get("/finish", (req, res) => {
         let btn = document.getElementById("btn");
         let bar = document.getElementById("bar");
 
+        let started = false;
+
         btn.onclick = () => {
+
+            // 👉 lần 2 → vào checkpoint
+            if (started) {
+                window.location.href = "/checkpoint";
+                return;
+            }
+
+            // 👉 lần 1 → chạy 3s
+            started = true;
             btn.disabled = true;
 
             let t = 3;
@@ -474,13 +497,16 @@ app.get("/finish", (req, res) => {
                 t--;
                 bar.style.width = ((3 - t) * 33) + "%";
 
-                if(t > 0){
+                if (t > 0) {
                     btn.innerText = "Wait " + t + "s";
                 }
 
-                if(t <= 0){
+                if (t <= 0) {
                     clearInterval(i);
-                    window.location.href = "/checkpoint";
+                    bar.style.width = "100%";
+
+                    btn.innerText = "Get Key";
+                    btn.disabled = false;
                 }
             }, 1000);
         }
