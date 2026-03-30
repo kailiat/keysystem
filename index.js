@@ -270,7 +270,7 @@ async function startServer() {
 }
 
 // =======================
-// 🔥 START PAGE
+// 🔥 START PAGE (FIX BUG 1s)
 // =======================
 app.get("/start", (req, res) => {
     const target = req.query.target;
@@ -358,19 +358,24 @@ app.get("/start", (req, res) => {
             btn.disabled = true;
 
             let t = 5;
+            let total = 5;
+
             btn.innerText = "Wait " + t + "s";
 
             let i = setInterval(() => {
                 t--;
-                bar.style.width = ((5 - t) * 20) + "%";
 
-                if(t > 0){
+                bar.style.width = ((total - t) / total * 100) + "%";
+
+                if (t > 0) {
                     btn.innerText = "Wait " + t + "s";
-                }
-
-                if(t <= 0){
+                } else {
                     clearInterval(i);
-                    window.location.href = target;
+                    btn.innerText = "Loading...";
+
+                    setTimeout(() => {
+                        window.location.href = target;
+                    }, 300);
                 }
             }, 1000);
         }
@@ -379,7 +384,6 @@ app.get("/start", (req, res) => {
     </html>
     `);
 });
-
 
 // =======================
 // 🔥 FINISH PAGE
