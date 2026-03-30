@@ -366,9 +366,9 @@ app.get("/start", (req, res) => {
                 let url = null;
 
                 if (type === "lv") {
-                    url = "https://link-center.net/4560147/cMIMi8z45eQQ";
+                    url = "https://link-target.net/4248703/h4J9AzNpDif7";
                 } else if (type === "ll") {
-                    url = "https://loot-link.com/s?ASbQHd3Y";
+                    url = "https://lootdest.org/s?KHhWiw31";
                 }
 
                 if (!url) {
