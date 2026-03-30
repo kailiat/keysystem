@@ -268,8 +268,9 @@ async function startServer() {
         console.error("❌ Failed to start:", err);
     }
 }
+
 // =======================
-// 🔥 START PAGE (5s delay)
+// 🔥 START PAGE
 // =======================
 app.get("/start", (req, res) => {
     const target = req.query.target;
@@ -282,7 +283,7 @@ app.get("/start", (req, res) => {
         margin:0;
         background: radial-gradient(circle at top, #0f172a, #020617);
         color: white;
-        font-family: Arial;
+        font-family: 'Segoe UI', sans-serif;
         display:flex;
         justify-content:center;
         align-items:center;
@@ -293,8 +294,14 @@ app.get("/start", (req, res) => {
         padding:35px;
         border-radius:18px;
         text-align:center;
-        width:320px;
-        box-shadow: 0 0 40px rgba(99,102,241,0.2);
+        width:340px;
+        box-shadow: 0 0 50px rgba(99,102,241,0.25);
+    }
+    .brand {
+        font-size:20px;
+        font-weight:600;
+        margin-bottom:10px;
+        color:#818cf8;
     }
     h2 {
         margin-bottom:10px;
@@ -333,13 +340,9 @@ app.get("/start", (req, res) => {
     </head>
 
     <body>
-
-        <!-- 🔥 BRAND -->
-        <div style="position:absolute; top:20px; text-align:center; width:100%; font-size:13px; letter-spacing:1px; color:#6366f1; opacity:0.8;">
-            SHIBA • GET KEY
-        </div>
-
         <div class="box">
+            <div class="brand">Shiba - Get Key</div>
+
             <h2>Verification Step</h2>
             <p>Click continue to verify</p>
 
@@ -367,12 +370,7 @@ app.get("/start", (req, res) => {
 
                 if(t <= 0){
                     clearInterval(i);
-                    btn.innerText = "Continue";
-                    btn.disabled = false;
-
-                    btn.onclick = () => {
-                        window.location.href = target;
-                    }
+                    window.location.href = target;
                 }
             }, 1000);
         }
@@ -393,9 +391,9 @@ app.get("/finish", (req, res) => {
     <style>
     body {
         margin:0;
-        background: #0f172a;
-        color: white;
-        font-family: Arial;
+        background: radial-gradient(circle at top, #0f172a, #020617);
+        color:white;
+        font-family:'Segoe UI', sans-serif;
         display:flex;
         justify-content:center;
         align-items:center;
@@ -403,76 +401,76 @@ app.get("/finish", (req, res) => {
     }
     .box {
         background:#1e293b;
-        padding:30px;
-        border-radius:15px;
+        padding:35px;
+        border-radius:18px;
         text-align:center;
-        width:300px;
-        box-shadow: 0 0 40px rgba(99,102,241,0.2);
+        width:340px;
+        box-shadow: 0 0 50px rgba(99,102,241,0.25);
+    }
+    .brand {
+        font-size:20px;
+        font-weight:600;
+        margin-bottom:10px;
+        color:#22c55e;
     }
     button {
-        margin-top:15px;
-        padding:10px 20px;
+        margin-top:20px;
+        padding:12px 25px;
         border:none;
-        border-radius:10px;
+        border-radius:12px;
         background:#22c55e;
         color:white;
         cursor:pointer;
         font-size:15px;
     }
     button:disabled {
-        opacity:0.5;
-        cursor:not-allowed;
+        background:#374151;
     }
     .bar {
-        height:4px;
-        background:#6366f1;
-        margin-top:15px;
-        border-radius:10px;
+        height:5px;
         width:0%;
-        transition: width 1s linear;
+        background:#22c55e;
+        border-radius:10px;
+        margin-top:15px;
+        transition:width 1s linear;
     }
     </style>
     </head>
 
     <body>
-
-        <!-- 🔥 BRAND -->
-        <div style="position:absolute; top:20px; text-align:center; width:100%; font-size:13px; letter-spacing:1px; color:#6366f1; opacity:0.8;">
-            SHIBA • GET KEY
-        </div>
-
         <div class="box">
-            <h2>Generating Key...</h2>
-            <p id="text">Preparing your access</p>
-            <button id="btn" disabled>Get Key</button>
+            <div class="brand">Shiba - Get Key</div>
+
+            <h2>Generate Key</h2>
+            <p>Click to finish and receive your key</p>
+
+            <button id="btn">Get Key</button>
             <div class="bar" id="bar"></div>
         </div>
 
         <script>
-        let t = 3;
         let btn = document.getElementById("btn");
-        let text = document.getElementById("text");
         let bar = document.getElementById("bar");
 
-        let progress = 0;
-
-        let i = setInterval(() => {
-            t--;
-            progress += 33;
-            bar.style.width = progress + "%";
-
-            text.innerText = "Generating key... " + t;
-
-            if(t <= 0){
-                clearInterval(i);
-                bar.style.width = "100%";
-                text.innerText = "Ready!";
-                btn.disabled = false;
-            }
-        }, 1000);
-
         btn.onclick = () => {
-            window.location.href = "/checkpoint";
+            btn.disabled = true;
+
+            let t = 3;
+            btn.innerText = "Wait " + t + "s";
+
+            let i = setInterval(() => {
+                t--;
+                bar.style.width = ((3 - t) * 33) + "%";
+
+                if(t > 0){
+                    btn.innerText = "Wait " + t + "s";
+                }
+
+                if(t <= 0){
+                    clearInterval(i);
+                    window.location.href = "/checkpoint";
+                }
+            }, 1000);
         }
         </script>
     </body>
