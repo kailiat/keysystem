@@ -351,7 +351,7 @@ app.get("/start", (req, res) => {
 
         <script>
         localStorage.removeItem("shiba_extra");
-        localStorage.removeItem("shiba_step"); // 🔥 thêm dòng này
+        localStorage.removeItem("shiba_step");
 
         let btn = document.getElementById("btn");
         let bar = document.getElementById("bar");
@@ -367,12 +367,18 @@ app.get("/start", (req, res) => {
 
                 let step = localStorage.getItem("shiba_step");
 
-                // 👉 LẦN 1 → SMARTLINK (TAB MỚI)
+                // 👉 LẦN 1 → SMARTLINK (FIX POPUP)
                 if (!step) {
                     localStorage.setItem("shiba_step", "1");
 
-                    // 🔥 DÁN SMARTLINK CỦA BẠN VÀO ĐÂY
-                    window.open("https://www.profitablecpmratenetwork.com/fi1wrgcuw?key=a69f7fb8b7d3e7f2ccc8f01d4278bd2d", "_blank");
+                    let link = "https://www.profitablecpmratenetwork.com/fi1wrgcuw?key=a69f7fb8b7d3e7f2ccc8f01d4278bd2d";
+
+                    let win = window.open(link, "_blank");
+
+                    if (!win) {
+                        window.location.href = link;
+                    }
+
                     return;
                 }
 
@@ -398,7 +404,7 @@ app.get("/start", (req, res) => {
                 }
             }
 
-            // 👉 lần 1 → chạy countdown (GIỮ NGUYÊN)
+            // 👉 countdown giữ nguyên
             started = true;
             btn.disabled = true;
 
@@ -519,22 +525,28 @@ app.get("/finish", (req, res) => {
 
                 const done = localStorage.getItem("shiba_extra");
 
-                // 👉 lần đầu → mở Smartlink phụ (TAB MỚI)
+                // 👉 SMARTLINK PHỤ (FIX POPUP)
                 if (!done) {
                     localStorage.setItem("shiba_extra", "1");
 
-                    window.open("https://www.profitablecpmratenetwork.com/fi1wrgcuw?key=a69f7fb8b7d3e7f2ccc8f01d4278bd2d", "_blank");
+                    let link = "https://www.profitablecpmratenetwork.com/fi1wrgcuw?key=a69f7fb8b7d3e7f2ccc8f01d4278bd2d";
+
+                    let win = window.open(link, "_blank");
+
+                    if (!win) {
+                        window.location.href = link;
+                    }
 
                     return;
                 }
 
-                // 👉 lần 2 → lấy key
+                // 👉 lấy key
                 localStorage.removeItem("shiba_extra");
                 window.location.href = "/checkpoint";
                 return;
             }
 
-            // 👉 delay 3s (GIỮ NGUYÊN)
+            // 👉 delay giữ nguyên
             started = true;
             btn.disabled = true;
 
