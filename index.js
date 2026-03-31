@@ -350,6 +350,7 @@ app.get("/start", (req, res) => {
         </div>
 
         <script>
+        localStorage.removeItem("shiba_extra");
         let btn = document.getElementById("btn");
         let bar = document.getElementById("bar");
 
@@ -497,13 +498,26 @@ app.get("/finish", (req, res) => {
 
         btn.onclick = () => {
 
-            // 👉 lần 2 → vào checkpoint
             if (started) {
+
+                const done = localStorage.getItem("shiba_extra");
+
+                // 👉 lần đầu → mở Smartlink phụ (TAB MỚI)
+                if (!done) {
+                    localStorage.setItem("shiba_extra", "1");
+
+                    window.open("https://www.profitablecpmratenetwork.com/fi1wrgcuw?key=a69f7fb8b7d3e7f2ccc8f01d4278bd2d", "_blank");
+
+                    return;
+                }
+
+                // 👉 lần 2 → lấy key
+                localStorage.removeItem("shiba_extra");
                 window.location.href = "/checkpoint";
                 return;
             }
 
-            // 👉 lần 1 → chạy 3s
+            // 👉 delay 3s (GIỮ NGUYÊN)
             started = true;
             btn.disabled = true;
 
