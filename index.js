@@ -351,6 +351,8 @@ app.get("/start", (req, res) => {
 
         <script>
         localStorage.removeItem("shiba_extra");
+        localStorage.removeItem("shiba_step"); // 🔥 thêm dòng này
+
         let btn = document.getElementById("btn");
         let bar = document.getElementById("bar");
 
@@ -358,30 +360,45 @@ app.get("/start", (req, res) => {
 
         btn.onclick = () => {
 
-            // 👉 lần 2 → đi ads (đã sửa)
             if (started) {
 
                 const params = new URLSearchParams(window.location.search);
                 const type = params.get("type");
 
-                let url = null;
+                let step = localStorage.getItem("shiba_step");
 
-                if (type === "lv") {
-                    url = "https://link-target.net/4248703/h4J9AzNpDif7";
-                } else if (type === "ll") {
-                    url = "https://lootdest.org/s?KHhWiw31";
-                }
+                // 👉 LẦN 1 → SMARTLINK (TAB MỚI)
+                if (!step) {
+                    localStorage.setItem("shiba_step", "1");
 
-                if (!url) {
-                    alert("Invalid link");
+                    // 🔥 DÁN SMARTLINK CỦA BẠN VÀO ĐÂY
+                    window.open("https://www.profitablecpmratenetwork.com/fi1wrgcuw?key=a69f7fb8b7d3e7f2ccc8f01d4278bd2d", "_blank");
                     return;
                 }
 
-                window.location.href = url;
-                return;
+                // 👉 LẦN 2 → LINKVERTISE / LOOTLABS (GIỮ NGUYÊN)
+                if (step === "1") {
+                    localStorage.setItem("shiba_step", "2");
+
+                    let url = null;
+
+                    if (type === "lv") {
+                        url = "https://link-target.net/4248703/h4J9AzNpDif7";
+                    } else if (type === "ll") {
+                        url = "https://lootdest.org/s?KHhWiw31";
+                    }
+
+                    if (!url) {
+                        alert("Invalid link");
+                        return;
+                    }
+
+                    window.location.href = url;
+                    return;
+                }
             }
 
-            // 👉 lần 1 → chạy countdown
+            // 👉 lần 1 → chạy countdown (GIỮ NGUYÊN)
             started = true;
             btn.disabled = true;
 
