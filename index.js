@@ -278,64 +278,96 @@ app.get("/start", (req, res) => {
     <html>
     <head>
     <style>
+body {
+    margin:0;
+    background: radial-gradient(circle at top, #0f172a, #020617);
+    color: white;
+    font-family: Arial;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    height:100vh;
+}
+.box {
+    background:#1e293b;
+    padding:35px;
+    border-radius:18px;
+    text-align:center;
+    width:320px;
+    box-shadow: 0 0 40px rgba(99,102,241,0.2);
+}
+.logo {
+    font-size:18px;
+    font-weight:600;
+    margin-bottom:10px;
+    color:#a5b4fc;
+}
+h2 {
+    margin-bottom:10px;
+}
+p {
+    color:#94a3b8;
+    font-size:14px;
+}
+button {
+    margin-top:20px;
+    padding:12px 25px;
+    border:none;
+    border-radius:12px;
+    background:#6366f1;
+    color:white;
+    cursor:pointer;
+    font-size:15px;
+    transition:0.2s;
+}
+button:disabled {
+    background:#374151;
+    cursor:not-allowed;
+}
+button:hover:not(:disabled){
+    transform:scale(1.05);
+}
+.bar {
+    height:5px;
+    width:0%;
+    background:#6366f1;
+    border-radius:10px;
+    margin-top:15px;
+    transition:width 1s linear;
+}
+
+/* 🔥 FIX MOBILE (QUAN TRỌNG) */
+@media (max-width: 600px) {
     body {
-        margin:0;
-        background: radial-gradient(circle at top, #0f172a, #020617);
-        color: white;
-        font-family: Arial;
-        display:flex;
-        justify-content:center;
-        align-items:center;
-        height:100vh;
+        padding: 15px;
     }
+
     .box {
-        background:#1e293b;
-        padding:35px;
-        border-radius:18px;
-        text-align:center;
-        width:320px;
-        box-shadow: 0 0 40px rgba(99,102,241,0.2);
+        width: 100%;
+        max-width: 380px;
+        padding: 45px;
+        border-radius: 22px;
     }
+
     .logo {
-        font-size:18px;
-        font-weight:600;
-        margin-bottom:10px;
-        color:#a5b4fc;
+        font-size: 20px;
     }
+
     h2 {
-        margin-bottom:10px;
+        font-size: 22px;
     }
+
     p {
-        color:#94a3b8;
-        font-size:14px;
+        font-size: 16px;
     }
+
     button {
-        margin-top:20px;
-        padding:12px 25px;
-        border:none;
-        border-radius:12px;
-        background:#6366f1;
-        color:white;
-        cursor:pointer;
-        font-size:15px;
-        transition:0.2s;
+        width: 100%;
+        padding: 15px;
+        font-size: 17px;
     }
-    button:disabled {
-        background:#374151;
-        cursor:not-allowed;
-    }
-    button:hover:not(:disabled){
-        transform:scale(1.05);
-    }
-    .bar {
-        height:5px;
-        width:0%;
-        background:#6366f1;
-        border-radius:10px;
-        margin-top:15px;
-        transition:width 1s linear;
-    }
-    </style>
+}
+</style>
     </head>
 
     <body>
@@ -441,65 +473,97 @@ app.get("/finish", (req, res) => {
     res.send(`
     <html>
     <head>
-    <style>
+   <style>
+body {
+    margin:0;
+    background: radial-gradient(circle at top, #0f172a, #020617);
+    color: white;
+    font-family: Arial;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    height:100vh;
+}
+.box {
+    background:#1e293b;
+    padding:35px;
+    border-radius:18px;
+    text-align:center;
+    width:320px;
+    box-shadow: 0 0 40px rgba(99,102,241,0.2);
+}
+.logo {
+    font-size:18px;
+    font-weight:600;
+    margin-bottom:10px;
+    color:#a5b4fc;
+}
+h2 {
+    margin-bottom:10px;
+}
+p {
+    color:#94a3b8;
+    font-size:14px;
+}
+button {
+    margin-top:20px;
+    padding:12px 25px;
+    border:none;
+    border-radius:12px;
+    background:#6366f1;
+    color:white;
+    cursor:pointer;
+    font-size:15px;
+    transition:0.2s;
+}
+button:disabled {
+    background:#374151;
+    cursor:not-allowed;
+}
+button:hover:not(:disabled){
+    transform:scale(1.05);
+}
+.bar {
+    height:5px;
+    width:0%;
+    background:#6366f1;
+    border-radius:10px;
+    margin-top:15px;
+    transition:width 1s linear;
+}
+
+/* 🔥 FIX MOBILE (QUAN TRỌNG) */
+@media (max-width: 600px) {
     body {
-        margin:0;
-        background: radial-gradient(circle at top, #0f172a, #020617);
-        color:white;
-        font-family: Arial;
-        display:flex;
-        justify-content:center;
-        align-items:center;
-        height:100vh;
+        padding: 15px;
     }
+
     .box {
-        background:#1e293b;
-        padding:35px;
-        border-radius:18px;
-        text-align:center;
-        width:320px;
-        box-shadow: 0 0 40px rgba(99,102,241,0.2);
+        width: 100%;
+        max-width: 380px;
+        padding: 45px;
+        border-radius: 22px;
     }
+
     .logo {
-        font-size:18px;
-        font-weight:600;
-        margin-bottom:10px;
-        color:#a5b4fc;
+        font-size: 20px;
     }
+
     h2 {
-        margin-bottom:10px;
+        font-size: 22px;
     }
+
     p {
-        color:#94a3b8;
-        font-size:14px;
+        font-size: 16px;
     }
+
     button {
-        margin-top:20px;
-        padding:12px 25px;
-        border:none;
-        border-radius:12px;
-        background:#22c55e;
-        color:white;
-        cursor:pointer;
-        font-size:15px;
-        transition:0.2s;
+        width: 100%;
+        padding: 15px;
+        font-size: 17px;
     }
-    button:disabled {
-        background:#374151;
-        cursor:not-allowed;
-    }
-    button:hover:not(:disabled){
-        transform:scale(1.05);
-    }
-    .bar {
-        height:5px;
-        width:0%;
-        background:#22c55e;
-        border-radius:10px;
-        margin-top:15px;
-        transition:width 1s linear;
-    }
-    </style>
+}
+</style>
     </head>
 
     <body>
