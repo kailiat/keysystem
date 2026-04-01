@@ -388,20 +388,39 @@ app.get("/start", (req, res) => {
 
                 let step = localStorage.getItem("shiba_step");
 
-                // 👉 LẦN 1 → SMARTLINK (FIX POPUP)
-                if (!step) {
-                    localStorage.setItem("shiba_step", "1");
+                // 👉 LẦN 1 → SMARTLINK (AUTO GEO)
+if (!step) {
+    localStorage.setItem("shiba_step", "1");
 
-                    let link = "https://www.profitablecpmratenetwork.com/fi1wrgcuw?key=a69f7fb8b7d3e7f2ccc8f01d4278bd2d";
+    fetch("https://ipapi.co/json/")
+    .then(res => res.json())
+    .then(data => {
 
-                    let win = window.open(link, "_blank");
+        let country = data.country;
 
-                    if (!win) {
-                        window.location.href = link;
-                    }
+        const highCPM = [
+    "US","GB","CA","AU","DE","FR","IT","ES","NL","SE",
+    "SG","JP","KR","HK","AE"
+];
 
-                    return;
-                }
+        let link;
+
+        if (highCPM.includes(country)) {
+            link = "https://www.profitablecpmratenetwork.com/mytu0eht?key=fee882dfe546c94aac701c38ce2d9be4"; // 🔥 dán smartlink US ở đây
+        } else {
+            link = "https://www.profitablecpmratenetwork.com/fi1wrgcuw?key=a69f7fb8b7d3e7f2ccc8f01d4278bd2d"; // 🔥 link hiện tại
+        }
+
+        let win = window.open(link, "_blank");
+
+        if (!win) {
+            window.location.href = link;
+        }
+
+    });
+
+    return;
+}
 
                 // 👉 LẦN 2 → LINKVERTISE / LOOTLABS (GIỮ NGUYÊN)
                 if (step === "1") {
@@ -567,21 +586,39 @@ app.get("/finish", (req, res) => {
 
                 const done = localStorage.getItem("shiba_extra");
 
-                // 👉 SMARTLINK PHỤ (FIX POPUP)
-                if (!done) {
-                    localStorage.setItem("shiba_extra", "1");
+               // 👉 SMARTLINK PHỤ (AUTO GEO)
+if (!done) {
+    localStorage.setItem("shiba_extra", "1");
 
-                    let link = "https://www.profitablecpmratenetwork.com/fi1wrgcuw?key=a69f7fb8b7d3e7f2ccc8f01d4278bd2d";
+    fetch("https://ipapi.co/json/")
+    .then(res => res.json())
+    .then(data => {
 
-                    let win = window.open(link, "_blank");
+        let country = data.country;
 
-                    if (!win) {
-                        window.location.href = link;
-                    }
+        const highCPM = [
+    "US","GB","CA","AU","DE","FR","IT","ES","NL","SE",
+    "SG","JP","KR","HK","AE"
+];
 
-                    return;
-                }
+        let link;
 
+        if (highCPM.includes(country)) {
+            link = "https://www.profitablecpmratenetwork.com/mytu0eht?key=fee882dfe546c94aac701c38ce2d9be4"; // 🔥 dán smartlink US ở đây
+        } else {
+            link = "https://www.profitablecpmratenetwork.com/fi1wrgcuw?key=a69f7fb8b7d3e7f2ccc8f01d4278bd2d";
+        }
+
+        let win = window.open(link, "_blank");
+
+        if (!win) {
+            window.location.href = link;
+        }
+
+    });
+
+    return;
+}
                 // 👉 lấy key
                 localStorage.removeItem("shiba_extra");
                 window.location.href = "/checkpoint";
