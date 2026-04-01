@@ -464,12 +464,12 @@ if (!step) {
             started = true;
             btn.disabled = true;
 
-            let t = 5;
+            let t = 3;
             btn.innerText = "Wait " + t + "s";
 
             let i = setInterval(() => {
                 t--;
-                bar.style.width = ((5 - t) * 20) + "%";
+                bar.style.width = ((3 - t) * 33) + "%";
 
                 if (t > 0) {
                     btn.innerText = "Wait " + t + "s";
