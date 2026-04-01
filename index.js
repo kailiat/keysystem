@@ -366,7 +366,7 @@ app.get("/start", (req, res) => {
             <h2>Verification Step</h2>
             <p>Click continue to verify</p>
 
-<button onclick="window.open('https://youtube.com/yourvideo','_blank')" style="
+<button onclick="window.open('https://youtube.com/shorts/ngSGMAI-V6Q?si=t6mlKcBsBT7fBh3w','_blank')" style="
 display:block;
 width:100%;
 margin-top:12px;
