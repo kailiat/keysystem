@@ -366,6 +366,20 @@ app.get("/start", (req, res) => {
             <h2>Verification Step</h2>
             <p>Click continue to verify</p>
 
+<button onclick="window.open('https://youtube.com/yourvideo','_blank')" style="
+margin-top:12px;
+padding:10px 20px;
+border:none;
+border-radius:12px;
+background:#ff0000;
+color:white;
+cursor:pointer;
+font-size:14px;
+transition:0.2s;
+">
+▶ Watch Tutorial
+</button>
+
             <button id="btn">Continue</button>
             <div class="bar" id="bar"></div>
         </div>
