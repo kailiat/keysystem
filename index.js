@@ -367,14 +367,16 @@ app.get("/start", (req, res) => {
             <p>Click continue to verify</p>
 
 <button onclick="window.open('https://youtube.com/yourvideo','_blank')" style="
+display:block;
+width:100%;
 margin-top:12px;
-padding:10px 20px;
+padding:12px;
 border:none;
 border-radius:12px;
 background:#ff0000;
 color:white;
 cursor:pointer;
-font-size:14px;
+font-size:15px;
 transition:0.2s;
 ">
 ▶ Watch Tutorial
