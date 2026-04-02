@@ -277,8 +277,6 @@ app.get("/start", (req, res) => {
     res.send(`
     <html>
     <head>
-
-    <!-- 🔥 QUAN TRỌNG NHẤT -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <style>
@@ -333,23 +331,17 @@ app.get("/start", (req, res) => {
         transition:width 1s linear;
     }
 
-    /* 🔥 AUTO SCALE MOBILE */
     @media (max-width: 600px) {
-        body {
-            padding: 15px;
-        }
-
+        body { padding: 15px; }
         .box {
             width: 100%;
             max-width: 420px;
             padding: 50px;
             border-radius: 22px;
         }
-
         .logo { font-size: 22px; }
         h2 { font-size: 24px; }
         p { font-size: 17px; }
-
         button {
             width: 100%;
             padding: 16px;
@@ -377,7 +369,6 @@ background:#ff0000;
 color:white;
 cursor:pointer;
 font-size:15px;
-transition:0.2s;
 ">
 ▶ Watch Tutorial
 </button>
@@ -404,41 +395,22 @@ transition:0.2s;
 
                 let step = localStorage.getItem("shiba_step");
 
-                // 👉 LẦN 1 → SMARTLINK (AUTO GEO)
-if (!step) {
-    localStorage.setItem("shiba_step", "1");
+                // 👉 LẦN 1 → SMARTLINK (1 LINK DUY NHẤT)
+                if (!step) {
+                    localStorage.setItem("shiba_step", "1");
 
-    fetch("https://ipapi.co/json/")
-    .then(res => res.json())
-    .then(data => {
+                    let link = "https://www.profitablecpmratenetwork.com/fi1wrgcuw?key=a69f7fb8b7d3e7f2ccc8f01d4278bd2d";
 
-        let country = data.country;
+                    let win = window.open(link, "_blank");
 
-        const highCPM = [
-    "US","GB","CA","AU","DE","FR","IT","ES","NL","SE",
-    "SG","JP","KR","HK","AE"
-];
+                    if (!win) {
+                        window.location.href = link;
+                    }
 
-        let link;
+                    return;
+                }
 
-        if (highCPM.includes(country)) {
-            link = "https://www.profitablecpmratenetwork.com/mytu0eht?key=fee882dfe546c94aac701c38ce2d9be4"; // 🔥 dán smartlink US ở đây
-        } else {
-            link = "https://www.profitablecpmratenetwork.com/fi1wrgcuw?key=a69f7fb8b7d3e7f2ccc8f01d4278bd2d"; // 🔥 link hiện tại
-        }
-
-        let win = window.open(link, "_blank");
-
-        if (!win) {
-            window.location.href = link;
-        }
-
-    });
-
-    return;
-}
-
-                // 👉 LẦN 2 → LINKVERTISE / LOOTLABS (GIỮ NGUYÊN)
+                // 👉 LẦN 2 → LINKVERTISE / LOOTLABS
                 if (step === "1") {
                     localStorage.setItem("shiba_step", "2");
 
@@ -460,7 +432,6 @@ if (!step) {
                 }
             }
 
-            // 👉 countdown giữ nguyên
             started = true;
             btn.disabled = true;
 
@@ -471,14 +442,11 @@ if (!step) {
                 t--;
                 bar.style.width = ((3 - t) * 33) + "%";
 
-                if (t > 0) {
-                    btn.innerText = "Wait " + t + "s";
-                }
+                if (t > 0) btn.innerText = "Wait " + t + "s";
 
                 if (t <= 0) {
                     clearInterval(i);
                     bar.style.width = "100%";
-
                     btn.innerText = "Continue";
                     btn.disabled = false;
                 }
@@ -497,8 +465,6 @@ app.get("/finish", (req, res) => {
     res.send(`
     <html>
     <head>
-
-    <!-- 🔥 QUAN TRỌNG NHẤT -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <style>
@@ -538,11 +504,9 @@ app.get("/finish", (req, res) => {
         color:white;
         cursor:pointer;
         font-size:15px;
-        transition:0.2s;
     }
 
-    button:disabled { background:#374151; cursor:not-allowed; }
-    button:hover:not(:disabled){ transform:scale(1.05); }
+    button:disabled { background:#374151; }
 
     .bar {
         height:5px;
@@ -551,30 +515,6 @@ app.get("/finish", (req, res) => {
         border-radius:10px;
         margin-top:15px;
         transition:width 1s linear;
-    }
-
-    /* 🔥 AUTO SCALE MOBILE */
-    @media (max-width: 600px) {
-        body {
-            padding: 15px;
-        }
-
-        .box {
-            width: 100%;
-            max-width: 420px;
-            padding: 50px;
-            border-radius: 22px;
-        }
-
-        .logo { font-size: 22px; }
-        h2 { font-size: 24px; }
-        p { font-size: 17px; }
-
-        button {
-            width: 100%;
-            padding: 16px;
-            font-size: 18px;
-        }
     }
     </style>
     </head>
@@ -602,46 +542,26 @@ app.get("/finish", (req, res) => {
 
                 const done = localStorage.getItem("shiba_extra");
 
-               // 👉 SMARTLINK PHỤ (AUTO GEO)
-if (!done) {
-    localStorage.setItem("shiba_extra", "1");
+                // 👉 SMARTLINK PHỤ (1 LINK DUY NHẤT)
+                if (!done) {
+                    localStorage.setItem("shiba_extra", "1");
 
-    fetch("https://ipapi.co/json/")
-    .then(res => res.json())
-    .then(data => {
+                    let link = "https://www.profitablecpmratenetwork.com/fi1wrgcuw?key=a69f7fb8b7d3e7f2ccc8f01d4278bd2d";
 
-        let country = data.country;
+                    let win = window.open(link, "_blank");
 
-        const highCPM = [
-    "US","GB","CA","AU","DE","FR","IT","ES","NL","SE",
-    "SG","JP","KR","HK","AE"
-];
+                    if (!win) {
+                        window.location.href = link;
+                    }
 
-        let link;
+                    return;
+                }
 
-        if (highCPM.includes(country)) {
-            link = "https://www.profitablecpmratenetwork.com/mytu0eht?key=fee882dfe546c94aac701c38ce2d9be4"; // 🔥 dán smartlink US ở đây
-        } else {
-            link = "https://www.profitablecpmratenetwork.com/fi1wrgcuw?key=a69f7fb8b7d3e7f2ccc8f01d4278bd2d";
-        }
-
-        let win = window.open(link, "_blank");
-
-        if (!win) {
-            window.location.href = link;
-        }
-
-    });
-
-    return;
-}
-                // 👉 lấy key
                 localStorage.removeItem("shiba_extra");
                 window.location.href = "/checkpoint";
                 return;
             }
 
-            // 👉 delay giữ nguyên
             started = true;
             btn.disabled = true;
 
@@ -652,14 +572,11 @@ if (!done) {
                 t--;
                 bar.style.width = ((3 - t) * 33) + "%";
 
-                if (t > 0) {
-                    btn.innerText = "Wait " + t + "s";
-                }
+                if (t > 0) btn.innerText = "Wait " + t + "s";
 
                 if (t <= 0) {
                     clearInterval(i);
                     bar.style.width = "100%";
-
                     btn.innerText = "Get Key";
                     btn.disabled = false;
                 }
