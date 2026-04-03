@@ -403,7 +403,7 @@ let token = Math.random().toString(36).substring(2, 10);
 
 let tokenData = {
     value: token,
-    expire: Date.now() + 10 * 60 * 1000
+    expire: Date.now() + 60 * 60 * 1000
 };
 
 sessionStorage.setItem("shiba_token", JSON.stringify(tokenData));
