@@ -406,7 +406,7 @@ let tokenData = {
     expire: Date.now() + 60 * 60 * 1000
 };
 
-sessionStorage.setItem("shiba_token", JSON.stringify(tokenData));
+localStorage.setItem("shiba_token", JSON.stringify(tokenData));
 
                     let rand = Math.random();
 let link;
@@ -549,7 +549,7 @@ app.get("/finish", (req, res) => {
         <script>
 
 // 🔒 CHẶN BYPASS + TOKEN CHECK (FINAL)
-let raw = sessionStorage.getItem("shiba_token");
+let raw = localStorage.getItem("shiba_token");
 
 let data = null;
 
@@ -563,7 +563,7 @@ if (raw) {
 
 // ❌ nếu không có token hoặc hết hạn → đá về start
 if (!data || Date.now() > data.expire) {
-    sessionStorage.removeItem("shiba_token");
+    localStorage.removeItem("shiba_token");
     window.location.href = "/start";
 }
 
