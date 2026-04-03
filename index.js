@@ -453,7 +453,7 @@ let link;
 if (rand < 0.5) {
     link = "https://www.profitablecpmratenetwork.com/fi1wrgcuw?key=a69f7fb8b7d3e7f2ccc8f01d4278bd2d";
 } else {
-    link = "https://www.modcraftforge.com/roblox/blox-fruits-script-auto-farm-mastery-2025?pub=3343337";
+    link = "https://www.profitablecpmratenetwork.com/fi1wrgcuw?key=a69f7fb8b7d3e7f2ccc8f01d4278bd2d";
 }
 
                     let win = window.open(link, "_blank");
@@ -665,7 +665,7 @@ if (!data || Date.now() > data.expire) {
                 if (rand < 0.5) {
                     link = "https://www.profitablecpmratenetwork.com/fi1wrgcuw?key=a69f7fb8b7d3e7f2ccc8f01d4278bd2d";
                 } else {
-                    link = "https://www.modcraftforge.com/roblox/blox-fruits-script-auto-farm-mastery-2025?pub=3343337";
+                    link = "https://www.profitablecpmratenetwork.com/fi1wrgcuw?key=a69f7fb8b7d3e7f2ccc8f01d4278bd2d";
                 }
 
                 let win = window.open(link, "_blank");
@@ -688,7 +688,7 @@ if (!data || Date.now() > data.expire) {
                 if (rand < 0.5) {
                     link = "https://www.profitablecpmratenetwork.com/fi1wrgcuw?key=a69f7fb8b7d3e7f2ccc8f01d4278bd2d";
                 } else {
-                    link = "https://www.modcraftforge.com/roblox/blox-fruits-script-auto-farm-mastery-2025?pub=3343337";
+                    link = "https://www.profitablecpmratenetwork.com/fi1wrgcuw?key=a69f7fb8b7d3e7f2ccc8f01d4278bd2d";
                 }
 
                 let win = window.open(link, "_blank");
