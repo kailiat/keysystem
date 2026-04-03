@@ -538,7 +538,13 @@ app.get("/finish", (req, res) => {
         </div>
 
         <script>
-        let btn = document.getElementById("btn");
+
+// 🔒 CHẶN BYPASS (bắt buộc đi qua start)
+if (!localStorage.getItem("shiba_step")) {
+    window.location.href = "/start";
+}
+
+let btn = document.getElementById("btn");
         let bar = document.getElementById("bar");
 
         let started = false;
