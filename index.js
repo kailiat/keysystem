@@ -600,18 +600,6 @@ if (!data || Date.now() > data.expire) {
                 This link is no longer valid.<br>
                 Please go back and get a new key.
             </p>
-
-            <button onclick="window.location.href='/start'" style="
-                padding:12px 25px;
-                border:none;
-                border-radius:12px;
-                background:#6366f1;
-                color:white;
-                cursor:pointer;
-                font-size:15px;
-            ">
-                Go Back
-            </button>
         </div>
     </div>
     \`;
