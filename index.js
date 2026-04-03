@@ -548,9 +548,8 @@ app.get("/finish", (req, res) => {
 
         <script>
 
-// 🔒 CHẶN BYPASS + TOKEN CHECK (FINAL)
+// 🔒 CHẶN BYPASS + TOKEN CHECK (FINAL FIX)
 let raw = localStorage.getItem("shiba_token");
-
 let data = null;
 
 if (raw) {
@@ -561,151 +560,149 @@ if (raw) {
     }
 }
 
-// ❌ nếu không có token hoặc hết hạn → đá về start
 if (!data || Date.now() > data.expire) {
     localStorage.removeItem("shiba_token");
 
-   document.body.innerHTML = `
-<div style="
-    display:flex;
-    justify-content:center;
-    align-items:center;
-    height:100vh;
-    background: radial-gradient(circle at top, #0f172a, #020617);
-    font-family: Arial;
-">
+    document.body.innerHTML = \`
     <div style="
-        background:#1e293b;
-        padding:35px;
-        border-radius:18px;
-        text-align:center;
-        width:320px;
-        box-shadow: 0 0 40px rgba(99,102,241,0.2);
-        color:white;
+        display:flex;
+        justify-content:center;
+        align-items:center;
+        height:100vh;
+        background: radial-gradient(circle at top, #0f172a, #020617);
+        font-family: Arial;
     ">
         <div style="
-            font-size:18px;
-            font-weight:600;
-            margin-bottom:10px;
-            color:#a5b4fc;
-        ">
-            Shiba - Get Key
-        </div>
-
-        <h2 style="margin-bottom:10px;">Session Expired</h2>
-
-        <p style="
-            color:#94a3b8;
-            font-size:14px;
-            margin-bottom:20px;
-        ">
-            This link is no longer valid.<br>
-            Please go back and get a new key.
-        </p>
-
-        <button onclick="window.location.href='/start'" style="
-            padding:12px 25px;
-            border:none;
-            border-radius:12px;
-            background:#6366f1;
+            background:#1e293b;
+            padding:35px;
+            border-radius:18px;
+            text-align:center;
+            width:320px;
+            box-shadow: 0 0 40px rgba(99,102,241,0.2);
             color:white;
-            cursor:pointer;
-            font-size:15px;
-            transition:0.2s;
         ">
-            Go Back
-        </button>
+            <div style="
+                font-size:18px;
+                font-weight:600;
+                margin-bottom:10px;
+                color:#a5b4fc;
+            ">
+                Shiba - Get Key
+            </div>
+
+            <h2 style="margin-bottom:10px;">Session Expired</h2>
+
+            <p style="
+                color:#94a3b8;
+                font-size:14px;
+                margin-bottom:20px;
+            ">
+                This link is no longer valid.<br>
+                Please go back and get a new key.
+            </p>
+
+            <button onclick="window.location.href='/start'" style="
+                padding:12px 25px;
+                border:none;
+                border-radius:12px;
+                background:#6366f1;
+                color:white;
+                cursor:pointer;
+                font-size:15px;
+            ">
+                Go Back
+            </button>
+        </div>
     </div>
-</div>
-`;
+    \`;
 
-    // 🔥 dừng hoàn toàn
-    return;
-}
-let btn = document.getElementById("btn");
-        let bar = document.getElementById("bar");
+} else {
 
-        let started = false;
+    let btn = document.getElementById("btn");
+    let bar = document.getElementById("bar");
 
-        btn.onclick = () => {
+    let started = false;
 
-           if (started) {
+    btn.onclick = () => {
 
-    const first = localStorage.getItem("shiba_first");
+        if (started) {
 
-    // 👉 CLICK 1 → redirect mới
-    if (!first) {
-        localStorage.setItem("shiba_first", "1");
+            const first = localStorage.getItem("shiba_first");
 
-        let rand = Math.random();
-        let link;
+            if (!first) {
+                localStorage.setItem("shiba_first", "1");
 
-        if (rand < 0.5) {
-            link = "https://www.profitablecpmratenetwork.com/fi1wrgcuw?key=a69f7fb8b7d3e7f2ccc8f01d4278bd2d";
-        } else {
-            link = "https://www.modcraftforge.com/roblox/blox-fruits-script-auto-farm-mastery-2025?pub=3343337";
-        }
+                let rand = Math.random();
+                let link;
 
-        let win = window.open(link, "_blank");
-
-        if (!win) {
-            window.location.href = link;
-        }
-
-        return;
-    }
-
-    // 👉 CLICK 2 → logic cũ của bạn
-    const done = localStorage.getItem("shiba_extra");
-
-    if (!done) {
-        localStorage.setItem("shiba_extra", "1");
-
-        let rand = Math.random();
-        let link;
-
-        if (rand < 0.5) {
-            link = "https://www.profitablecpmratenetwork.com/fi1wrgcuw?key=a69f7fb8b7d3e7f2ccc8f01d4278bd2d";
-        } else {
-            link = "https://www.modcraftforge.com/roblox/blox-fruits-script-auto-farm-mastery-2025?pub=3343337";
-        }
-
-        let win = window.open(link, "_blank");
-
-        if (!win) {
-            window.location.href = link;
-        }
-
-        return;
-    }
-
-    localStorage.removeItem("shiba_extra");
-    localStorage.removeItem("shiba_first");
-
-    window.location.href = "/checkpoint";
-    return;
-}
-
-            started = true;
-            btn.disabled = true;
-
-            let t = 3;
-            btn.innerText = "Wait " + t + "s";
-
-            let i = setInterval(() => {
-                t--;
-                bar.style.width = ((3 - t) * 33) + "%";
-
-                if (t > 0) btn.innerText = "Wait " + t + "s";
-
-                if (t <= 0) {
-                    clearInterval(i);
-                    bar.style.width = "100%";
-                    btn.innerText = "Get Key";
-                    btn.disabled = false;
+                if (rand < 0.5) {
+                    link = "https://www.profitablecpmratenetwork.com/fi1wrgcuw?key=a69f7fb8b7d3e7f2ccc8f01d4278bd2d";
+                } else {
+                    link = "https://www.modcraftforge.com/roblox/blox-fruits-script-auto-farm-mastery-2025?pub=3343337";
                 }
-            }, 1000);
+
+                let win = window.open(link, "_blank");
+
+                if (!win) {
+                    window.location.href = link;
+                }
+
+                return;
+            }
+
+            const done = localStorage.getItem("shiba_extra");
+
+            if (!done) {
+                localStorage.setItem("shiba_extra", "1");
+
+                let rand = Math.random();
+                let link;
+
+                if (rand < 0.5) {
+                    link = "https://www.profitablecpmratenetwork.com/fi1wrgcuw?key=a69f7fb8b7d3e7f2ccc8f01d4278bd2d";
+                } else {
+                    link = "https://www.modcraftforge.com/roblox/blox-fruits-script-auto-farm-mastery-2025?pub=3343337";
+                }
+
+                let win = window.open(link, "_blank");
+
+                if (!win) {
+                    window.location.href = link;
+                }
+
+                return;
+            }
+
+            localStorage.removeItem("shiba_extra");
+            localStorage.removeItem("shiba_first");
+
+            window.location.href = "/checkpoint";
+            return;
         }
+
+        started = true;
+        btn.disabled = true;
+
+        let t = 3;
+        btn.innerText = "Wait " + t + "s";
+
+        let i = setInterval(() => {
+            t--;
+            bar.style.width = ((3 - t) * 33) + "%";
+
+            if (t > 0) btn.innerText = "Wait " + t + "s";
+
+            if (t <= 0) {
+                clearInterval(i);
+                bar.style.width = "100%";
+                btn.innerText = "Get Key";
+                btn.disabled = false;
+            }
+        }, 1000);
+    };
+
+}
+
         </script>
     </body>
     </html>
