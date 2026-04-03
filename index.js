@@ -269,6 +269,45 @@ async function startServer() {
     }
 }
 
+app.get("/home", (req, res) => {
+    res.send(`
+    <html>
+    <head>
+    <title>Shiba Key System</title>
+    <style>
+    body {
+        margin:0;
+        background: radial-gradient(circle at top, #0f172a, #020617);
+        color:white;
+        font-family:Arial;
+        display:flex;
+        justify-content:center;
+        align-items:center;
+        height:100vh;
+    }
+    .box {
+        background:#1e293b;
+        padding:30px;
+        border-radius:15px;
+        text-align:center;
+        width:300px;
+    }
+    h2 { margin-bottom:10px; }
+    p { color:#94a3b8; }
+    </style>
+    </head>
+
+    <body>
+        <div class="box">
+            <h2>Shiba Key System</h2>
+            <p>Unlock Roblox scripts easily using our key system.</p>
+        </div>
+    </body>
+    </html>
+    `);
+});
+
+
 // =======================
 // 🔥 START PAGE (FIX FULL - KHÔNG DÙNG TARGET)
 // =======================
