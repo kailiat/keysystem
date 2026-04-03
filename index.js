@@ -548,21 +548,28 @@ app.get("/finish", (req, res) => {
 
         <script>
 
-// 🔒 CHẶN BYPASS + TOKEN CHECK
-let data = sessionStorage.getItem("shiba_token");
+// 🔒 CHẶN BYPASS + TOKEN CHECK (FIX)
+let raw = sessionStorage.getItem("shiba_token");
 
-if (!data) {
+if (!raw) {
     window.location.href = "/start";
-    return;
+    throw new Error("No token");
 }
 
-data = JSON.parse(data);
+let data;
+
+try {
+    data = JSON.parse(raw);
+} catch (e) {
+    window.location.href = "/start";
+    throw new Error("Invalid token");
+}
 
 // ❌ hết hạn
 if (Date.now() > data.expire) {
     sessionStorage.removeItem("shiba_token");
     window.location.href = "/start";
-    return;
+    throw new Error("Token expired");
 }
 
 let btn = document.getElementById("btn");
