@@ -564,9 +564,64 @@ if (raw) {
 // ❌ nếu không có token hoặc hết hạn → đá về start
 if (!data || Date.now() > data.expire) {
     localStorage.removeItem("shiba_token");
-    window.location.href = "/start";
-}
 
+   document.body.innerHTML = `
+<div style="
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    height:100vh;
+    background: radial-gradient(circle at top, #0f172a, #020617);
+    font-family: Arial;
+">
+    <div style="
+        background:#1e293b;
+        padding:35px;
+        border-radius:18px;
+        text-align:center;
+        width:320px;
+        box-shadow: 0 0 40px rgba(99,102,241,0.2);
+        color:white;
+    ">
+        <div style="
+            font-size:18px;
+            font-weight:600;
+            margin-bottom:10px;
+            color:#a5b4fc;
+        ">
+            Shiba - Get Key
+        </div>
+
+        <h2 style="margin-bottom:10px;">Session Expired</h2>
+
+        <p style="
+            color:#94a3b8;
+            font-size:14px;
+            margin-bottom:20px;
+        ">
+            This link is no longer valid.<br>
+            Please go back and get a new key.
+        </p>
+
+        <button onclick="window.location.href='/start'" style="
+            padding:12px 25px;
+            border:none;
+            border-radius:12px;
+            background:#6366f1;
+            color:white;
+            cursor:pointer;
+            font-size:15px;
+            transition:0.2s;
+        ">
+            Go Back
+        </button>
+    </div>
+</div>
+`;
+
+    // 🔥 dừng hoàn toàn
+    return;
+}
 let btn = document.getElementById("btn");
         let bar = document.getElementById("bar");
 
