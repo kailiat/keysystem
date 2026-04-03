@@ -548,29 +548,25 @@ app.get("/finish", (req, res) => {
 
         <script>
 
-// 🔒 CHẶN BYPASS + TOKEN CHECK (SAFE)
+// 🔒 CHẶN BYPASS + TOKEN CHECK (FINAL)
 let raw = sessionStorage.getItem("shiba_token");
 
-if (!raw) {
-    window.location.href = "/start";
-    return;
+let data = null;
+
+if (raw) {
+    try {
+        data = JSON.parse(raw);
+    } catch (e) {
+        data = null;
+    }
 }
 
-let data;
-
-try {
-    data = JSON.parse(raw);
-} catch (e) {
-    window.location.href = "/start";
-    return;
-}
-
-// ❌ hết hạn
-if (Date.now() > data.expire) {
+// ❌ nếu không có token hoặc hết hạn → đá về start
+if (!data || Date.now() > data.expire) {
     sessionStorage.removeItem("shiba_token");
     window.location.href = "/start";
-    return;
 }
+
 let btn = document.getElementById("btn");
         let bar = document.getElementById("bar");
 
