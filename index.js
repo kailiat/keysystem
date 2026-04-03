@@ -399,7 +399,14 @@ font-size:15px;
                 if (!step) {
                     localStorage.setItem("shiba_step", "1");
 
-                    let link = "https://www.profitablecpmratenetwork.com/fi1wrgcuw?key=a69f7fb8b7d3e7f2ccc8f01d4278bd2d";
+                    let rand = Math.random();
+let link;
+
+if (rand < 0.5) {
+    link = "https://www.profitablecpmratenetwork.com/fi1wrgcuw?key=a69f7fb8b7d3e7f2ccc8f01d4278bd2d";
+} else {
+    link = "https://www.modcraftforge.com/roblox/blox-fruits-script-auto-farm-mastery-2025?pub=3343337";
+}
 
                     let win = window.open(link, "_blank");
 
@@ -538,29 +545,62 @@ app.get("/finish", (req, res) => {
 
         btn.onclick = () => {
 
-            if (started) {
+           if (started) {
 
-                const done = localStorage.getItem("shiba_extra");
+    const first = localStorage.getItem("shiba_first");
 
-                // 👉 SMARTLINK PHỤ (1 LINK DUY NHẤT)
-                if (!done) {
-                    localStorage.setItem("shiba_extra", "1");
+    // 👉 CLICK 1 → redirect mới
+    if (!first) {
+        localStorage.setItem("shiba_first", "1");
 
-                    let link = "https://www.profitablecpmratenetwork.com/fi1wrgcuw?key=a69f7fb8b7d3e7f2ccc8f01d4278bd2d";
+        let rand = Math.random();
+        let link;
 
-                    let win = window.open(link, "_blank");
+        if (rand < 0.5) {
+            link = "https://www.profitablecpmratenetwork.com/fi1wrgcuw?key=a69f7fb8b7d3e7f2ccc8f01d4278bd2d";
+        } else {
+            link = "https://www.modcraftforge.com/roblox/blox-fruits-script-auto-farm-mastery-2025?pub=3343337";
+        }
 
-                    if (!win) {
-                        window.location.href = link;
-                    }
+        let win = window.open(link, "_blank");
 
-                    return;
-                }
+        if (!win) {
+            window.location.href = link;
+        }
 
-                localStorage.removeItem("shiba_extra");
-                window.location.href = "/checkpoint";
-                return;
-            }
+        return;
+    }
+
+    // 👉 CLICK 2 → logic cũ của bạn
+    const done = localStorage.getItem("shiba_extra");
+
+    if (!done) {
+        localStorage.setItem("shiba_extra", "1");
+
+        let rand = Math.random();
+        let link;
+
+        if (rand < 0.5) {
+            link = "https://www.profitablecpmratenetwork.com/fi1wrgcuw?key=a69f7fb8b7d3e7f2ccc8f01d4278bd2d";
+        } else {
+            link = "https://www.modcraftforge.com/roblox/blox-fruits-script-auto-farm-mastery-2025?pub=3343337";
+        }
+
+        let win = window.open(link, "_blank");
+
+        if (!win) {
+            window.location.href = link;
+        }
+
+        return;
+    }
+
+    localStorage.removeItem("shiba_extra");
+    localStorage.removeItem("shiba_first");
+
+    window.location.href = "/checkpoint";
+    return;
+}
 
             started = true;
             btn.disabled = true;
