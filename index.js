@@ -398,6 +398,15 @@ font-size:15px;
                 // 👉 LẦN 1 → SMARTLINK (1 LINK DUY NHẤT)
                 if (!step) {
                     localStorage.setItem("shiba_step", "1");
+                    // 🔐 tạo token + expire 10 phút
+let token = Math.random().toString(36).substring(2, 10);
+
+let tokenData = {
+    value: token,
+    expire: Date.now() + 10 * 60 * 1000
+};
+
+sessionStorage.setItem("shiba_token", JSON.stringify(tokenData));
 
                     let rand = Math.random();
 let link;
@@ -539,9 +548,21 @@ app.get("/finish", (req, res) => {
 
         <script>
 
-// 🔒 CHẶN BYPASS (bắt buộc đi qua start)
-if (!localStorage.getItem("shiba_step")) {
+// 🔒 CHẶN BYPASS + TOKEN CHECK
+let data = sessionStorage.getItem("shiba_token");
+
+if (!data) {
     window.location.href = "/start";
+    return;
+}
+
+data = JSON.parse(data);
+
+// ❌ hết hạn
+if (Date.now() > data.expire) {
+    sessionStorage.removeItem("shiba_token");
+    window.location.href = "/start";
+    return;
 }
 
 let btn = document.getElementById("btn");
