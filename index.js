@@ -434,40 +434,56 @@ font-size:15px;
 
                 let step = localStorage.getItem("shiba_step");
 
-                // 👉 LẦN 1 → SMARTLINK (1 LINK DUY NHẤT)
+                // 👉 LẦN 1
                 if (!step) {
                     localStorage.setItem("shiba_step", "1");
-                    // 🔐 tạo token + expire 10 phút
-let token = Math.random().toString(36).substring(2, 10);
 
-let tokenData = {
-    value: token,
-    expire: Date.now() + 60 * 60 * 1000
-};
+                    let token = Math.random().toString(36).substring(2, 10);
 
-localStorage.setItem("shiba_token", JSON.stringify(tokenData));
+                    let tokenData = {
+                        value: token,
+                        expire: Date.now() + 60 * 60 * 1000
+                    };
+
+                    localStorage.setItem("shiba_token", JSON.stringify(tokenData));
 
                     let rand = Math.random();
-let link;
+                    let link;
 
-if (rand < 0.5) {
-    link = "https://www.profitablecpmratenetwork.com/fi1wrgcuw?key=a69f7fb8b7d3e7f2ccc8f01d4278bd2d";
-} else {
-    link = "https://omg10.com/4/10829793";
-}
+                    if (rand < 0.5) {
+                        link = "https://www.profitablecpmratenetwork.com/fi1wrgcuw?key=a69f7fb8b7d3e7f2ccc8f01d4278bd2d";
+                    } else {
+                        link = "https://omg10.com/4/10829793";
+                    }
 
                     let win = window.open(link, "_blank");
-
-                    if (!win) {
-                        window.location.href = link;
-                    }
+                    if (!win) window.location.href = link;
 
                     return;
                 }
 
-                // 👉 LẦN 2 → LINKVERTISE / LOOTLABS
+                // 👉 LẦN 2 (THÊM)
                 if (step === "1") {
                     localStorage.setItem("shiba_step", "2");
+
+                    let rand = Math.random();
+                    let link;
+
+                    if (rand < 0.5) {
+                        link = "https://www.profitablecpmratenetwork.com/fi1wrgcuw?key=a69f7fb8b7d3e7f2ccc8f01d4278bd2d";
+                    } else {
+                        link = "https://omg10.com/4/10829793";
+                    }
+
+                    let win = window.open(link, "_blank");
+                    if (!win) window.location.href = link;
+
+                    return;
+                }
+
+                // 👉 LẦN 3 → LINKVERTISE / LOOTLABS
+                if (step === "2") {
+                    localStorage.setItem("shiba_step", "3");
 
                     let url = null;
 
