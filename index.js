@@ -397,6 +397,23 @@ app.get("/start", (req, res) => {
             <h2>Verification Step</h2>
             <p>Click continue to verify</p>
 
+<button onclick="window.open('https://discord.gg/yourlink','_blank')" style="
+display:block;
+width:100%;
+margin-top:12px;
+padding:12px;
+border:none;
+border-radius:12px;
+background:#5865F2;
+color:white;
+cursor:pointer;
+font-size:15px;
+font-weight:500;
+transition:0.2s;
+">
+💬 Join Discord
+</button>
+
 <button onclick="window.open('https://youtube.com/shorts/ngSGMAI-V6Q?si=t6mlKcBsBT7fBh3w','_blank')" style="
 display:block;
 width:100%;
