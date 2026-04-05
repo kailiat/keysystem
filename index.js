@@ -411,7 +411,7 @@ font-size:15px;
 font-weight:500;
 transition:0.2s;
 ">
-💬 Join Discord
+💬 Discord
 </button>
 
 <button onclick="window.open('https://youtube.com/shorts/ngSGMAI-V6Q?si=t6mlKcBsBT7fBh3w','_blank')" style="
