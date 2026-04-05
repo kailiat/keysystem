@@ -397,7 +397,7 @@ app.get("/start", (req, res) => {
             <h2>Verification Step</h2>
             <p>Click continue to verify</p>
 
-<button onclick="window.open('https://discord.gg/yourlink','_blank')" style="
+<button onclick="window.open('https://discord.gg/RbhFbKbABe','_blank')" style="
 display:block;
 width:100%;
 margin-top:12px;
